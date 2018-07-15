@@ -19,20 +19,12 @@ Unity project for Dream State.
 2. Download Unity ([Link](https://store.unity.com/))
 3. Download Visual Studio Code ([Link](https://code.visualstudio.com/download))
 4. Install .NET SDK ([Link](https://www.microsoft.com/net/learn/get-started/macos))
-5. Install VS Code C# Extension ([Link](https://marketplace.visualstudio.com/items?itemName=ms-vscode.csharp))
-6. Download Mono .NET Framework ([Link](http://www.mono-project.com/download/stable/))
+5. Download Mono .NET Framework ([Link](http://www.mono-project.com/download/stable/))
+6. Install VS Code C# Extension ([Link](https://marketplace.visualstudio.com/items?itemName=ms-vscode.csharp))
 7. Install Debugger for Unity VS Code Extension ([Link](https://marketplace.visualstudio.com/items?itemName=Unity.unity-debug))
 8. Install Unity Tools VS Code Extension ([Link](https://marketplace.visualstudio.com/items?itemName=Tobiah.unity-tools))
 9. Set Unity External Script Editor (Unity -> Preferences -> External Tools) to VS Code (located at `/Applications/Visual Studio Code.app`)
 10. Restart Mac
-
-## Getting this project
-
-Create directory `~/dev/justawesomegames` to clone this project into.
-
-HTTPS: `git clone https://github.com/justawesomegames/dream-state.git`
-
-SSH: `git clone git@github.com:justawesomegames/dream-state.git`
 
 ## Development
 

@@ -5,8 +5,7 @@ using UnityEngine;
 public class MovableCharacter : MonoBehaviour, IMovableCharacter {
   [SerializeField] private float maxSpeed = 10f;
   [SerializeField] private LayerMask groundLayer;
-  [SerializeField] private float maxJumpTime = 1.0f;
-  [SerializeField] private float jumpForce = 100f;
+  [SerializeField] private float jumpForce = 800f;
 
   private Rigidbody2D rigidBody;
   private BoxCollider2D collider;
@@ -15,7 +14,6 @@ public class MovableCharacter : MonoBehaviour, IMovableCharacter {
   private float curMoveScalar;
   private bool grounded;
   private bool jumping;
-  private bool jumped;
   private float airTime;
   private bool releasedJump;
 
@@ -54,30 +52,21 @@ public class MovableCharacter : MonoBehaviour, IMovableCharacter {
     // Handle horizontal movement
     var newVelocity = new Vector2(curMoveScalar * maxSpeed, rigidBody.velocity.y);
 
-    // Keep track of airtime while jumping
-    if (grounded) {
-      jumped = false;
-      airTime = 0.0f;
-    } else {
-      airTime += Time.deltaTime;
+    // Immediately kill vertical movement if character wants to stop jumping
+    if (!jumping && rigidBody.velocity.y > 0.0f) {
+      newVelocity.y = 0.0f;
     }
+
+    // Set velocity
+    rigidBody.velocity = newVelocity;
 
     if (shouldJump()) {
-      jumped = true;
+      grounded = false;
+      rigidBody.AddForce(new Vector2(0.0f, jumpForce));
     }
 
-    // If character jump is within the max, handle jumping, otherwise let physics handle the zenith
-    if (jumped && airTime < maxJumpTime) {
-      if (jumping) {
-        newVelocity.y = jumpForce;
-      } else {
-        newVelocity.y = 0.0f;
-        jumped = false;
-      }
-    }
-
-     // Keep track of if character released jump before landing to avoid bounce
-    if (jumped && !grounded && jumping && releasedJump) {
+     // To avoid bounce, keep track of if character released jump before landing
+    if (!grounded && jumping && releasedJump) {
       releasedJump = false;
     }
     else if (!releasedJump && !jumping) {
@@ -85,12 +74,9 @@ public class MovableCharacter : MonoBehaviour, IMovableCharacter {
     }
 
     // TODO: Handle dashing
-
-    // Set velocity
-    rigidBody.velocity = newVelocity;
   }
 
   private bool shouldJump() {
-    return grounded && jumping && !jumped && releasedJump;
+    return grounded && jumping && releasedJump;
   }
 }

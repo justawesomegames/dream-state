@@ -1,51 +1,58 @@
 using System;
 using UnityEngine;
+using Global;
 
-public enum FacingDirection {
-  LEFT,
-  RIGHT
-}
-
+[RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
-public class MovableCharacter : MonoBehaviour, IMovableCharacter {
-  [SerializeField] private float maxSpeed = 10f;
-  [SerializeField] private LayerMask groundLayer;
-  [SerializeField] private float jumpForce = 800f;
+[RequireComponent(typeof(Animator))]
+public class MovableCharacter : MonoBehaviour {
+  [SerializeField] protected float maxSpeed = 10f;
+  [SerializeField] protected LayerMask groundLayer;
+  [SerializeField] protected float jumpForce = 800f;
+  [SerializeField] protected Transform groundedPoint;
 
-  private Rigidbody2D rigidBody;
-  private BoxCollider2D collider;
-  private Animator animator;
-  private Transform groundedPoint;
-  private Vector2 groundedSize;
-  private float curMoveScalar;
-  private bool grounded;
-  private bool jumping;
-  private float airTime;
-  private bool releasedJump;
-  private FacingDirection curFacingDir;
+  protected Rigidbody2D rigidBody;
+  protected BoxCollider2D collider;
+  protected Animator animator;
+  protected Vector2 groundedSize;
+  protected float curMoveScalar;
+  protected bool jumping;
+  protected float airTime;
+  protected bool releasedJump;
+  protected Constants.FacingDirection curFacingDir;
 
-  public void Move(float moveScalar) {
+  private bool _grounded;
+  protected bool grounded {
+    get { 
+      return _grounded; 
+    } 
+    set {
+      _grounded = value;
+      animator.SetBool("Grounded", value);
+    }
+  }
+
+  public virtual void Move(float moveScalar) {
     curMoveScalar = moveScalar;
   }
 
-  public void Dash(bool dash) {
+  public virtual void Dash(bool dash) {
     // TODO
   }
 
-  public void Jump(bool jump) {
+  public virtual void Jump(bool jump) {
     jumping = jump;
   }
 
-  private void Awake() {
+  protected virtual void Awake() {
     rigidBody = GetComponent<Rigidbody2D>();
     collider = GetComponent<BoxCollider2D>();
     animator = GetComponent<Animator>();
-    groundedPoint = transform.Find("GroundedPoint");
     groundedSize = new Vector2(collider.size.x * 0.98f, 0);
-    curFacingDir = FacingDirection.RIGHT;
+    curFacingDir = Constants.FacingDirection.RIGHT;
   }
 
-  private void FixedUpdate() {
+  protected virtual void FixedUpdate() {
     // Determine if character is grounded
     grounded = false;
     var groundedPos = new Vector2(groundedPoint.position.x, groundedPoint.position.y);
@@ -57,7 +64,7 @@ public class MovableCharacter : MonoBehaviour, IMovableCharacter {
     }
   }
 
-  private void Update() {
+  protected virtual void Update() {
     // Handle horizontal movement
     var newVelocity = new Vector2(curMoveScalar * maxSpeed, rigidBody.velocity.y);
 
@@ -65,10 +72,10 @@ public class MovableCharacter : MonoBehaviour, IMovableCharacter {
     animator.SetFloat("Speed", Mathf.Abs(curMoveScalar));
 
     // Handle which direction character should be facing
-    if (curFacingDir == FacingDirection.LEFT && curMoveScalar > 0.0f) {
-      setFacingDir(FacingDirection.RIGHT);
-    } else if (curFacingDir == FacingDirection.RIGHT && curMoveScalar < 0.0f) {
-      setFacingDir(FacingDirection.LEFT);
+    if (curFacingDir == Constants.FacingDirection.LEFT && curMoveScalar > 0.0f) {
+      setFacingDir(Constants.FacingDirection.RIGHT);
+    } else if (curFacingDir == Constants.FacingDirection.RIGHT && curMoveScalar < 0.0f) {
+      setFacingDir(Constants.FacingDirection.LEFT);
     }
 
     // Immediately kill vertical movement if character wants to stop jumping
@@ -95,17 +102,22 @@ public class MovableCharacter : MonoBehaviour, IMovableCharacter {
     // TODO: Handle dashing
   }
 
+  protected virtual void OnDrawGizmosSelected() {
+    Gizmos.color = Color.yellow;
+    Gizmos.DrawSphere(groundedPoint.transform.position, 0.1f);
+  }
+
   private bool shouldJump() {
     return grounded && jumping && releasedJump;
   }
 
-  private void setFacingDir(FacingDirection dir) {
+  private void setFacingDir(Constants.FacingDirection dir) {
     Vector3 newScale = transform.localScale;
     switch (dir) {
-      case FacingDirection.RIGHT:
+      case Constants.FacingDirection.RIGHT:
         newScale.x = 1;
         break;
-      case FacingDirection.LEFT:
+      case Constants.FacingDirection.LEFT:
         newScale.x = -1;
         break;
     }

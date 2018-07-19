@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4463690222503164}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GroundedPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -36,11 +36,11 @@ GameObject:
   - component: {fileID: 4561972165493298}
   - component: {fileID: 61823279785252152}
   - component: {fileID: 50175537036692076}
-  - component: {fileID: 114240768278290100}
-  - component: {fileID: 114088863582695598}
   - component: {fileID: 212889501177615960}
   - component: {fileID: 95930526847204934}
-  m_Layer: 0
+  - component: {fileID: 114422877688425760}
+  - component: {fileID: 114455658018678486}
+  m_Layer: 8
   m_Name: Dreamer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -106,7 +106,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.041029215, y: 0.007512331}
+  m_Offset: {x: -0.047938585, y: 0.007512331}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -117,7 +117,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.4102912, y: 1.7005205}
+  m_Size: {x: 1.3479228, y: 1.7005205}
   m_EdgeRadius: 0
 --- !u!95 &95930526847204934
 Animator:
@@ -137,7 +137,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &114088863582695598
+--- !u!114 &114422877688425760
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96ac495701f624b9281967984b761ffc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114240768278290100
+--- !u!114 &114455658018678486
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -156,7 +156,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1778227753367288}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3225ea25445284af7a6a21e3d6eee030, type: 3}
+  m_Script: {fileID: 11500000, guid: e14de9bdcba718b478005a2cc582eecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeed: 10
@@ -164,6 +164,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   jumpForce: 800
+  groundedPoint: {fileID: 4463690222503164}
+  lowerBlinkRangeTime: 0.2
+  upperBlinkRangeTime: 3
 --- !u!212 &212889501177615960
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -196,8 +199,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1819644371
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300014, guid: b51538eb52bf149578e5c2ce0bc53275, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

@@ -152,6 +152,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114455658018678486, guid: 47c864d037cb14a91b912e7c3f68187c,
+        type: 2}
+      propertyPath: upperBlinkRangeTime
+      value: 0.2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 47c864d037cb14a91b912e7c3f68187c, type: 2}
   m_IsPrefabParent: 0

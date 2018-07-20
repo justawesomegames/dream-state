@@ -11,8 +11,8 @@ public class PlayerController : MonoBehaviour {
   }
 
   private void Update() {
-    player.Move(Input.GetAxis(Global.Constants.Input.HORIZONTAL_AXIS));
-    player.Jump(Input.GetButton(Global.Constants.Input.JUMP));
-    player.Dash(Input.GetButton(Global.Constants.Input.DASH));
+    player.Move(Input.GetAxis(Constants.Input.HORIZONTAL_AXIS));
+    player.Jump(Input.GetButton(Constants.Input.JUMP));
+    player.Dash(Input.GetButton(Constants.Input.DASH));
   }
 }

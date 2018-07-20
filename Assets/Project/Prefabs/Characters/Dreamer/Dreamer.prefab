@@ -159,12 +159,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e14de9bdcba718b478005a2cc582eecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 10
+  runSpeed: 10
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
   jumpForce: 1000
   groundedPoint: {fileID: 4463690222503164}
+  dashSpeed: 15
+  maxDashTime: 0.4
 --- !u!212 &212889501177615960
 SpriteRenderer:
   m_ObjectHideFlags: 1

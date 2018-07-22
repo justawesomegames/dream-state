@@ -2,5 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Dreamer : MovableCharacter {
+namespace DreamState {
+  public class Dreamer : MovableCharacter {
+  }
 }

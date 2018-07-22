@@ -23,6 +23,7 @@ public class MovableCharacter : MonoBehaviour {
   protected Constants.FacingDirection curFacingDir;
   protected bool dashing;
   protected float dashTime;
+  protected float xVelocityInAir;
 
   private bool _grounded;
   protected bool grounded {
@@ -53,26 +54,30 @@ public class MovableCharacter : MonoBehaviour {
     animator = GetComponent<Animator>();
     groundedSize = new Vector2(collider.size.x * 0.98f, 0);
     curFacingDir = Constants.FacingDirection.RIGHT;
+    xVelocityInAir = runSpeed;
   }
 
   protected virtual void FixedUpdate() {
     // Determine if character is grounded
-    grounded = false;
+    var newGrounded = false;
     var groundedPos = new Vector2(groundedPoint.position.x, groundedPoint.position.y);
     var colliders = Physics2D.OverlapBoxAll(groundedPos, groundedSize, 0, groundLayer);
     foreach(var col in colliders) {
       if (col.gameObject != gameObject) {
-        grounded = true;
+        newGrounded = true;
       }
+    }
+    if (newGrounded != grounded) {
+      grounded = newGrounded;
     }
   }
 
   protected virtual void Update() {
     // Handle horizontal movement
-    var newVelocity = new Vector2(runSpeed * curMoveScalar, rigidBody.velocity.y);
+    var newVelocity = new Vector2((grounded ? runSpeed : xVelocityInAir) * curMoveScalar, rigidBody.velocity.y);
 
-    // Handle dashing
-    if (dashing) {
+    // Handle ground dashing
+    if (dashing && grounded) {
       dashTime += Time.deltaTime;
       if (dashTime < maxDashTime) {
         // Can continue dashing
@@ -100,32 +105,31 @@ public class MovableCharacter : MonoBehaviour {
       setFacingDir(Constants.FacingDirection.LEFT);
     }
 
-    // Immediately kill vertical movement if character wants to stop jumping
+    // Immediately kill y-velocity if character wants to stop jumping
     if (!jumping && rigidBody.velocity.y > 0.0f) {
       newVelocity.y = 0.0f;
     }
 
-    // Set velocity
+    // Set new velocity
     rigidBody.velocity = newVelocity;
 
     if (shouldJump()) {
       grounded = false;
+      releasedJump = false;
       rigidBody.AddForce(new Vector2(0.0f, jumpForce));
+
+      // If character is dashing while jumping, character can move at dash speed in air
+      xVelocityInAir = dashing ? dashSpeed : runSpeed;
     }
 
      // To avoid bounce, keep track of if character released jump before landing
-    if (!grounded && jumping && releasedJump) {
-      releasedJump = false;
-    }
-    else if (!releasedJump && !jumping) {
+    if (!jumping && !releasedJump) {
       releasedJump = true;
     }
-
-    // TODO: Handle dashing
   }
 
   protected virtual void OnDrawGizmosSelected() {
-    Gizmos.color = Color.yellow;
+    // Draw a gizmo at the grounded position since it doesn't easily render otherwise
     Gizmos.DrawSphere(groundedPoint.transform.position, 0.1f);
   }
 

@@ -160,13 +160,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   runSpeed: 10
+  jumpForce: 1000
+  dashSpeed: 15
+  maxDashTime: 0.4
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
-  jumpForce: 1000
   groundedPoint: {fileID: 4463690222503164}
-  dashSpeed: 15
-  maxDashTime: 0.4
 --- !u!212 &212889501177615960
 SpriteRenderer:
   m_ObjectHideFlags: 1

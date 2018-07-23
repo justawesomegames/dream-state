@@ -26,6 +26,7 @@ namespace DreamState
     protected float curMoveScalar;
     protected bool jumping;
     protected bool releasedJump;
+    protected bool releasedDashSinceJump;
     protected Global.Constants.FacingDirection curFacingDir;
     protected bool dashing;
     protected float dashTime;
@@ -79,6 +80,7 @@ namespace DreamState
       foreach(var col in colliders) {
         if (col.gameObject != gameObject) {
           newGrounded = true;
+          break;
         }
       }
       if (newGrounded != grounded) {
@@ -91,7 +93,7 @@ namespace DreamState
       var newVelocity = new Vector2((grounded ? runSpeed : xVelocityInAir) * curMoveScalar, rigidBody.velocity.y);
 
       // Handle ground dashing
-      if (dashing && grounded) {
+      if (dashing && grounded && releasedDashSinceJump) {
         dashTime += Time.deltaTime;
         if (dashTime < maxDashTime) {
           // Can continue dashing
@@ -133,12 +135,25 @@ namespace DreamState
         rigidBody.AddForce(new Vector2(0.0f, jumpForce));
 
         // If character is dashing while jumping, character can move at dash speed in air
-        xVelocityInAir = dashing ? dashSpeed : runSpeed;
+        xVelocityInAir = runSpeed;
+        if (dashing && releasedDashSinceJump) {
+          xVelocityInAir = dashSpeed;
+        }
+
+        releasedDashSinceJump = false;
       }
 
       // To avoid bounce, keep track of if character released jump before landing
-      if (!jumping && !releasedJump) {
+      if (grounded && !jumping && !releasedJump) {
         releasedJump = true;
+      }
+
+      // Avoid dashing after being aerial when button held
+      if (!grounded && dashing && releasedDashSinceJump) {
+        releasedDashSinceJump = false;
+      }
+      if (grounded && !dashing && !releasedDashSinceJump) {
+        releasedDashSinceJump = true;
       }
 
       OnUpdate();

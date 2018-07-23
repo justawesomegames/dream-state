@@ -26,7 +26,7 @@ namespace DreamState
     protected float curMoveScalar;
     protected bool jumping;
     protected bool releasedJump;
-    protected bool releasedDashSinceJump;
+    protected bool releasedDash;
     protected Global.Constants.FacingDirection curFacingDir;
     protected bool dashing;
     protected float dashTime;
@@ -38,8 +38,9 @@ namespace DreamState
         return _grounded; 
       } 
       set {
+        if (_grounded == value) return;
         _grounded = value;
-        animator.SetBool("Grounded", value);
+        handleGroundedChange(value);
       }
     }
     #endregion
@@ -80,12 +81,10 @@ namespace DreamState
       foreach(var col in colliders) {
         if (col.gameObject != gameObject) {
           newGrounded = true;
-          break;
         }
       }
-      if (newGrounded != grounded) {
-        grounded = newGrounded;
-      }
+
+      grounded = newGrounded;
     }
 
     protected void Update() {
@@ -93,9 +92,9 @@ namespace DreamState
       var newVelocity = new Vector2((grounded ? runSpeed : xVelocityInAir) * curMoveScalar, rigidBody.velocity.y);
 
       // Handle ground dashing
-      if (dashing && grounded && releasedDashSinceJump) {
+      if (dashing) {
         dashTime += Time.deltaTime;
-        if (dashTime < maxDashTime) {
+        if (dashTime < maxDashTime && grounded && releasedDash) {
           // Can continue dashing
           newVelocity.x = dashSpeed;
           animator.SetBool("Dashing", true);
@@ -105,14 +104,12 @@ namespace DreamState
         } else {
           // Trying to dash, but already reached max dash time
           animator.SetBool("Dashing", false);
+          releasedDash = false;
         }
       } else if(dashTime > 0) {
         dashTime = 0.0f;
         animator.SetBool("Dashing", false);
       }
-
-      // Set movement in animator
-      animator.SetFloat("Speed", Mathf.Abs(newVelocity.x));
 
       // Handle which direction character should be facing
       if (curFacingDir == Global.Constants.FacingDirection.LEFT && curMoveScalar > 0.0f) {
@@ -126,21 +123,12 @@ namespace DreamState
         newVelocity.y = 0.0f;
       }
 
-      // Set new velocity
-      rigidBody.velocity = newVelocity;
-
-      if (shouldJump()) {
+      // Handle jumping from grounded
+      if (grounded && jumping && releasedJump) {
         grounded = false;
         releasedJump = false;
+        releasedDash = false;
         rigidBody.AddForce(new Vector2(0.0f, jumpForce));
-
-        // If character is dashing while jumping, character can move at dash speed in air
-        xVelocityInAir = runSpeed;
-        if (dashing && releasedDashSinceJump) {
-          xVelocityInAir = dashSpeed;
-        }
-
-        releasedDashSinceJump = false;
       }
 
       // To avoid bounce, keep track of if character released jump before landing
@@ -149,12 +137,17 @@ namespace DreamState
       }
 
       // Avoid dashing after being aerial when button held
-      if (!grounded && dashing && releasedDashSinceJump) {
-        releasedDashSinceJump = false;
+      if (!grounded && dashing && releasedDash) {
+        releasedDash = false;
       }
-      if (grounded && !dashing && !releasedDashSinceJump) {
-        releasedDashSinceJump = true;
+      if (grounded && !dashing && !releasedDash) {
+        releasedDash = true;
       }
+
+      // Set new velocity
+      rigidBody.velocity = newVelocity;
+      animator.SetFloat("xSpeed", Mathf.Abs(newVelocity.x));
+      animator.SetFloat("ySpeed", newVelocity.y);
 
       OnUpdate();
     }
@@ -162,10 +155,6 @@ namespace DreamState
     protected void OnDrawGizmosSelected() {
       // Draw a gizmo at the grounded position since it doesn't easily render otherwise
       Gizmos.DrawSphere(groundedPoint.transform.position, 0.1f);
-    }
-
-    private bool shouldJump() {
-      return grounded && jumping && releasedJump;
     }
 
     private void setFacingDir(Global.Constants.FacingDirection dir) {
@@ -180,6 +169,13 @@ namespace DreamState
       }
       curFacingDir = dir;
       transform.localScale = newScale;
+    }
+
+    private void handleGroundedChange(bool newGrounded) {
+      animator.SetBool("Grounded", newGrounded);
+      if (!newGrounded) {
+        xVelocityInAir = dashing && dashTime < maxDashTime ? dashSpeed : runSpeed;
+      }
     }
   }
 }

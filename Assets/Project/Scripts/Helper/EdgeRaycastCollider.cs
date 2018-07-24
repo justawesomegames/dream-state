@@ -8,66 +8,83 @@ namespace DreamState {
     #region Public
     [SerializeField] private LayerMask collisionLayer;
     [SerializeField] [Range(0.0f, 1.0f)] private float tolerance = 0.98f;
-    [SerializeField] protected bool top;
-    [SerializeField] protected bool bottom;
-    [SerializeField] protected bool left;
-    [SerializeField] protected bool right;
+    public EdgeCollider Top;
+    public EdgeCollider Bottom;
+    public EdgeCollider Left;
+    public EdgeCollider Right;
     #endregion
-
-    #region Internal
-    private BoxCollider2D boxCollider;
-    private bool collidingTop;
-    private bool collidingBottom;
-    private bool collidingLeft;
-    private bool collidingRight;
-    #endregion
-
-    public bool Top() { return collidingTop; }
-    public bool Bottom() { return collidingBottom; }
-    public bool Left() { return collidingLeft; }
-    public bool Right() { return collidingRight; }
 
     private void Awake() {
-      boxCollider = gameObject.GetComponent<BoxCollider2D>();
+      Top = new EdgeCollider(
+        gameObject,
+        (t, c) => { return new Vector2(t.position.x + (c.offset.x * t.localScale.x), t.position.y + (c.size.y / 2) + c.offset.y); },
+        (c) => { return new Vector2(c.size.x * tolerance, 0); }
+      );
+      Bottom = new EdgeCollider(
+        gameObject,
+        (t, c) => { return new Vector2(t.position.x + (c.offset.x * t.localScale.x), t.position.y - (c.size.y / 2) - c.offset.y); },
+        (c) => { return new Vector2(c.size.x * tolerance, 0); }
+      );
+      Right = new EdgeCollider(
+        gameObject,
+        (t, c) => { return new Vector2(t.position.x + (c.size.x / 2) + (c.offset.x * t.localScale.x), t.position.y + c.offset.y); },
+        (c) => { return new Vector2(0, c.size.y * tolerance); }
+      );
+      Left = new EdgeCollider(
+        gameObject,
+        (t, c) => { return new Vector2(t.position.x - (c.size.x / 2) + (c.offset.x * t.localScale.x), t.position.y + c.offset.y); },
+        (c) => { return new Vector2(0, c.size.y * tolerance); }
+      );
     }
 
     private void FixedUpdate() {
-      var offsetX = boxCollider.offset.x * gameObject.transform.localScale.x;
-      var offsetY = boxCollider.offset.y * gameObject.transform.localScale.y;
-      if (top) {
-        collidingTop = getCollision(
-          new Vector2(gameObject.transform.position.x + offsetX, gameObject.transform.position.y + (boxCollider.size.y / 2) + boxCollider.offset.y),
-          new Vector2(boxCollider.size.x * tolerance, 0)
-        );
-      }
-      if (bottom) {
-        collidingBottom = getCollision(
-          new Vector2(gameObject.transform.position.x + offsetX, gameObject.transform.position.y - (boxCollider.size.y / 2) - boxCollider.offset.y),
-          new Vector2(boxCollider.size.x * tolerance, 0)
-        );
-      }
-      if (right) {
-        collidingRight = getCollision(
-          new Vector2(gameObject.transform.position.x + (boxCollider.size.x / 2) + offsetX, gameObject.transform.position.y + boxCollider.offset.y),
-          new Vector2(0, boxCollider.size.y * tolerance)
-        );
-      }
-      if (left) {
-        collidingLeft = getCollision(
-          new Vector2(gameObject.transform.position.x - (boxCollider.size.x / 2) + offsetX, gameObject.transform.position.y + boxCollider.offset.y),
-          new Vector2(0, boxCollider.size.y * tolerance)
-        );
-      }
+      Top.Update();
+      Bottom.Update();
+      Left.Update();
+      Right.Update();
     }
 
-    private bool getCollision(Vector2 pos, Vector2 size) {
-      var colliders = Physics2D.OverlapBoxAll(pos, size, 0, collisionLayer);
-      foreach(var col in colliders) {
-        if (col.gameObject != gameObject) {
-          return true;
+    public class EdgeCollider {
+      private GameObject gameObject;
+      private EdgeRaycastCollider collider;
+      private BoxCollider2D boxCollider;
+      private bool colliding;
+      private Func<Transform, BoxCollider2D, Vector2> position;
+      private Func<BoxCollider2D, Vector2> size;
+      private Action<bool> onChange;
+
+      public EdgeCollider(GameObject g, Func<Transform, BoxCollider2D, Vector2> pFunc, Func<BoxCollider2D, Vector2> sFunc) {
+        gameObject = g;
+        collider = g.GetComponent<EdgeRaycastCollider>();
+        boxCollider = g.GetComponent<BoxCollider2D>();
+        position = pFunc;
+        size = sFunc;
+      }
+
+      public void Update() {
+        var newColliding = false;
+        var colliders = Physics2D.OverlapBoxAll(position(gameObject.transform, boxCollider), size(boxCollider), 0, collider.collisionLayer);
+        foreach(var col in colliders) {
+          if (col.gameObject != gameObject) {
+            newColliding = true;
+          }
+        }
+
+        if (newColliding != colliding) {
+          colliding = newColliding;
+          if (onChange != null) {
+            onChange(newColliding);
+          }
         }
       }
-      return false;
+
+      public bool IsColliding() {
+        return colliding;
+      }
+
+      public void RegisterOnChange(Action<bool> a) {
+        onChange = a;
+      }
     }
   }
 }

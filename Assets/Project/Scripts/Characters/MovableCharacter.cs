@@ -13,6 +13,10 @@ namespace DreamState
     [SerializeField] protected float jumpForce = 800f;
     [SerializeField] protected float dashSpeed = 15f;
     [SerializeField] protected float maxDashTime = 0.4f;
+
+    [Header("Wall")]
+    [SerializeField] protected float wallStickTime = 0.3f;
+    [SerializeField] protected float wallFallSpeed = 10f;
     #endregion
 
     #region Internal
@@ -28,17 +32,11 @@ namespace DreamState
     protected bool dashing;
     protected float dashTime;
     protected float xVelocityInAir;
+    protected float curWallStickTime;
+    protected bool stickingToWall;
 
-    private bool _grounded;
     protected bool grounded {
-      get { 
-        return _grounded; 
-      } 
-      set {
-        if (_grounded == value) return;
-        _grounded = value;
-        handleGroundedChange(value);
-      }
+      get { return raycastCollider.Bottom.IsColliding(); }
     }
     #endregion
 
@@ -67,11 +65,10 @@ namespace DreamState
       curFacingDir = Global.Constants.FacingDirection.RIGHT;
       xVelocityInAir = runSpeed;
 
-      OnAwake();
-    }
+      // Register collision events
+      raycastCollider.Bottom.RegisterOnChange(groundedChange);
 
-    protected void FixedUpdate() {
-      grounded = raycastCollider.Bottom();
+      OnAwake();
     }
 
     protected void Update() {
@@ -112,7 +109,6 @@ namespace DreamState
 
       // Handle jumping from grounded
       if (grounded && jumping && releasedJump) {
-        grounded = false;
         releasedJump = false;
         releasedDash = false;
         rigidBody.AddForce(new Vector2(0.0f, jumpForce));
@@ -153,7 +149,7 @@ namespace DreamState
       transform.localScale = newScale;
     }
 
-    private void handleGroundedChange(bool newGrounded) {
+    private void groundedChange(bool newGrounded) {
       animator.SetBool("Grounded", newGrounded);
       if (!newGrounded) {
         xVelocityInAir = dashing && dashTime < maxDashTime ? dashSpeed : runSpeed;

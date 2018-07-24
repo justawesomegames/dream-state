@@ -135,6 +135,8 @@ MonoBehaviour:
   jumpForce: 1000
   dashSpeed: 15
   maxDashTime: 0.4
+  wallStickTime: 0.3
+  wallFallSpeed: 10
 --- !u!114 &114713539500714218
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -150,10 +152,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   tolerance: 0.99
-  top: 0
-  bottom: 1
-  left: 0
-  right: 0
 --- !u!212 &212889501177615960
 SpriteRenderer:
   m_ObjectHideFlags: 1

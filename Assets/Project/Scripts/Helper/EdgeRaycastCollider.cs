@@ -32,27 +32,29 @@ namespace DreamState {
     }
 
     private void FixedUpdate() {
+      var offsetX = boxCollider.offset.x * gameObject.transform.localScale.x;
+      var offsetY = boxCollider.offset.y * gameObject.transform.localScale.y;
       if (top) {
         collidingTop = getCollision(
-          new Vector2(gameObject.transform.position.x + boxCollider.offset.x, gameObject.transform.position.y + (boxCollider.size.y / 2) + boxCollider.offset.y),
+          new Vector2(gameObject.transform.position.x + offsetX, gameObject.transform.position.y + (boxCollider.size.y / 2) + boxCollider.offset.y),
           new Vector2(boxCollider.size.x * tolerance, 0)
         );
       }
       if (bottom) {
         collidingBottom = getCollision(
-          new Vector2(gameObject.transform.position.x + boxCollider.offset.x, gameObject.transform.position.y - (boxCollider.size.y / 2) - boxCollider.offset.y),
+          new Vector2(gameObject.transform.position.x + offsetX, gameObject.transform.position.y - (boxCollider.size.y / 2) - boxCollider.offset.y),
           new Vector2(boxCollider.size.x * tolerance, 0)
-        );
-      }
-      if (left) {
-        collidingLeft = getCollision(
-          new Vector2(gameObject.transform.position.x - (boxCollider.size.x / 2) - boxCollider.offset.x, gameObject.transform.position.y),
-          new Vector2(0, boxCollider.size.y * tolerance)
         );
       }
       if (right) {
         collidingRight = getCollision(
-          new Vector2(gameObject.transform.position.x + (boxCollider.size.x / 2) + boxCollider.offset.x, gameObject.transform.position.y),
+          new Vector2(gameObject.transform.position.x + (boxCollider.size.x / 2) + offsetX, gameObject.transform.position.y + boxCollider.offset.y),
+          new Vector2(0, boxCollider.size.y * tolerance)
+        );
+      }
+      if (left) {
+        collidingLeft = getCollision(
+          new Vector2(gameObject.transform.position.x - (boxCollider.size.x / 2) + offsetX, gameObject.transform.position.y + boxCollider.offset.y),
           new Vector2(0, boxCollider.size.y * tolerance)
         );
       }

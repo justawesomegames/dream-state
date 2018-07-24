@@ -149,7 +149,7 @@ MonoBehaviour:
   collisionLayer:
     serializedVersion: 2
     m_Bits: 256
-  tolerance: 0.96
+  tolerance: 0.99
   top: 0
   bottom: 1
   left: 0

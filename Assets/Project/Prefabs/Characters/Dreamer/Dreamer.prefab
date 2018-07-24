@@ -150,10 +150,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   tolerance: 0.96
-  topEnabled: 0
-  bottomEnabled: 1
-  leftEnabled: 0
-  rightEnabled: 0
+  top: 0
+  bottom: 1
+  left: 0
+  right: 0
 --- !u!212 &212889501177615960
 SpriteRenderer:
   m_ObjectHideFlags: 1

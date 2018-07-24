@@ -8,10 +8,10 @@ namespace DreamState {
     #region Public
     [SerializeField] private LayerMask collisionLayer;
     [SerializeField] [Range(0.0f, 1.0f)] private float tolerance = 0.98f;
-    [SerializeField] protected bool topEnabled;
-    [SerializeField] protected bool bottomEnabled;
-    [SerializeField] protected bool leftEnabled;
-    [SerializeField] protected bool rightEnabled;
+    [SerializeField] protected bool top;
+    [SerializeField] protected bool bottom;
+    [SerializeField] protected bool left;
+    [SerializeField] protected bool right;
     #endregion
 
     #region Internal
@@ -32,25 +32,25 @@ namespace DreamState {
     }
 
     private void FixedUpdate() {
-      if (topEnabled) {
+      if (top) {
         collidingTop = getCollision(
           new Vector2(gameObject.transform.position.x + boxCollider.offset.x, gameObject.transform.position.y + (boxCollider.size.y / 2) + boxCollider.offset.y),
           new Vector2(boxCollider.size.x * tolerance, 0)
         );
       }
-      if (bottomEnabled) {
+      if (bottom) {
         collidingBottom = getCollision(
           new Vector2(gameObject.transform.position.x + boxCollider.offset.x, gameObject.transform.position.y - (boxCollider.size.y / 2) - boxCollider.offset.y),
           new Vector2(boxCollider.size.x * tolerance, 0)
         );
       }
-      if (leftEnabled) {
+      if (left) {
         collidingLeft = getCollision(
           new Vector2(gameObject.transform.position.x - (boxCollider.size.x / 2) - boxCollider.offset.x, gameObject.transform.position.y),
           new Vector2(0, boxCollider.size.y * tolerance)
         );
       }
-      if (rightEnabled) {
+      if (right) {
         collidingRight = getCollision(
           new Vector2(gameObject.transform.position.x + (boxCollider.size.x / 2) + boxCollider.offset.x, gameObject.transform.position.y),
           new Vector2(0, boxCollider.size.y * tolerance)

@@ -5,24 +5,21 @@ namespace DreamState
   [RequireComponent(typeof(Rigidbody2D))]
   [RequireComponent(typeof(BoxCollider2D))]
   [RequireComponent(typeof(Animator))]
+  [RequireComponent(typeof(EdgeRaycastCollider))]
   public abstract class MovableCharacter : MonoBehaviour {
-    #region Visible
-    [Header("Movement configuration")]
+    #region Public
+    [Header("Movement")]
     [SerializeField] protected float runSpeed = 10f;
     [SerializeField] protected float jumpForce = 800f;
     [SerializeField] protected float dashSpeed = 15f;
     [SerializeField] protected float maxDashTime = 0.4f;
-
-    [Header("Collision configuration")]
-    [SerializeField] protected LayerMask groundLayer;
-    [SerializeField] protected Transform groundedPoint;
     #endregion
 
     #region Internal
     protected Rigidbody2D rigidBody;
-    protected BoxCollider2D collider;
+    protected BoxCollider2D boxCollider;
     protected Animator animator;
-    protected Vector2 groundedSize;
+    protected EdgeRaycastCollider raycastCollider;
     protected float curMoveScalar;
     protected bool jumping;
     protected bool releasedJump;
@@ -64,9 +61,9 @@ namespace DreamState
 
     protected void Awake() {
       rigidBody = GetComponent<Rigidbody2D>();
-      collider = GetComponent<BoxCollider2D>();
+      boxCollider = GetComponent<BoxCollider2D>();
       animator = GetComponent<Animator>();
-      groundedSize = new Vector2(collider.size.x * 0.98f, 0);
+      raycastCollider = GetComponent<EdgeRaycastCollider>();
       curFacingDir = Global.Constants.FacingDirection.RIGHT;
       xVelocityInAir = runSpeed;
 
@@ -74,17 +71,7 @@ namespace DreamState
     }
 
     protected void FixedUpdate() {
-      // Determine if character is grounded
-      var newGrounded = false;
-      var groundedPos = new Vector2(groundedPoint.position.x, groundedPoint.position.y);
-      var colliders = Physics2D.OverlapBoxAll(groundedPos, groundedSize, 0, groundLayer);
-      foreach(var col in colliders) {
-        if (col.gameObject != gameObject) {
-          newGrounded = true;
-        }
-      }
-
-      grounded = newGrounded;
+      grounded = raycastCollider.Bottom();
     }
 
     protected void Update() {
@@ -151,12 +138,7 @@ namespace DreamState
 
       OnUpdate();
     }
-
-    protected void OnDrawGizmosSelected() {
-      // Draw a gizmo at the grounded position since it doesn't easily render otherwise
-      Gizmos.DrawSphere(groundedPoint.transform.position, 0.1f);
-    }
-
+  
     private void setFacingDir(Global.Constants.FacingDirection dir) {
       Vector3 newScale = transform.localScale;
       switch (dir) {

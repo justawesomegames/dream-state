@@ -11,21 +11,6 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1778227753367288}
   m_IsPrefabParent: 1
---- !u!1 &1459793753507856
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 4463690222503164}
-  m_Layer: 8
-  m_Name: GroundedPoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!1 &1778227753367288
 GameObject:
   m_ObjectHideFlags: 0
@@ -40,6 +25,7 @@ GameObject:
   - component: {fileID: 95930526847204934}
   - component: {fileID: 114422877688425760}
   - component: {fileID: 114455658018678486}
+  - component: {fileID: 114713539500714218}
   m_Layer: 8
   m_Name: Dreamer
   m_TagString: Untagged
@@ -47,19 +33,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4463690222503164
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1459793753507856}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.845, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 4561972165493298}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4561972165493298
 Transform:
   m_ObjectHideFlags: 1
@@ -67,10 +40,9 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1778227753367288}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.04, y: -2.71, z: 0}
+  m_LocalPosition: {x: -8.166, y: -2.71, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 4463690222503164}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -163,10 +135,25 @@ MonoBehaviour:
   jumpForce: 1000
   dashSpeed: 15
   maxDashTime: 0.4
-  groundLayer:
+--- !u!114 &114713539500714218
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1778227753367288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e61d9896fdf664841b16b20ca8b73375, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collisionLayer:
     serializedVersion: 2
     m_Bits: 256
-  groundedPoint: {fileID: 4463690222503164}
+  tolerance: 0.96
+  topEnabled: 0
+  bottomEnabled: 1
+  leftEnabled: 0
+  rightEnabled: 0
 --- !u!212 &212889501177615960
 SpriteRenderer:
   m_ObjectHideFlags: 1

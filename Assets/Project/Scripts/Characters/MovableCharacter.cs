@@ -16,7 +16,7 @@ namespace DreamState
 
     [Header("Wall")]
     [SerializeField] protected float wallStickTime = 0.3f;
-    [SerializeField] protected float wallFallSpeed = 10f;
+    [SerializeField] protected float wallFallSpeed = 6f;
     #endregion
 
     #region Internal
@@ -35,9 +35,7 @@ namespace DreamState
     protected float curWallStickTime;
     protected bool stickingToWall;
 
-    protected bool grounded {
-      get { return raycastCollider.Bottom.IsColliding(); }
-    }
+    protected bool grounded { get { return raycastCollider.Bottom.IsColliding(); } }
     #endregion
 
     #region Virtual functions
@@ -71,7 +69,7 @@ namespace DreamState
       OnAwake();
     }
 
-    protected void Update() {
+    protected void FixedUpdate() {
       // Handle horizontal movement
       var newVelocity = new Vector2((grounded ? runSpeed : xVelocityInAir) * curMoveScalar, rigidBody.velocity.y);
 
@@ -123,8 +121,24 @@ namespace DreamState
       if (!grounded && dashing && releasedDash) {
         releasedDash = false;
       }
-      if (grounded && !dashing && !releasedDash) {
+      else if (grounded && !dashing && !releasedDash) {
         releasedDash = true;
+      }
+
+      // Determine if character is sticking to a wall
+      stickingToWall = ((raycastCollider.Left.IsColliding() && curMoveScalar < 0) || (raycastCollider.Right.IsColliding() && curMoveScalar > 0)) &&
+                       rigidBody.velocity.y <= 0.0f && !grounded;
+      animator.SetBool("StickingToWall", stickingToWall);
+
+      if (stickingToWall) {
+        curWallStickTime += Time.deltaTime;
+        if (curWallStickTime < wallStickTime) {
+          newVelocity.y = 0.0f;
+        } else {
+          newVelocity.y = -wallFallSpeed;
+        }
+      } else {
+        curWallStickTime = 0.0f;
       }
 
       // Set new velocity

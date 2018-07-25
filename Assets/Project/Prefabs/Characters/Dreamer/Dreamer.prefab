@@ -136,7 +136,7 @@ MonoBehaviour:
   dashSpeed: 15
   maxDashTime: 0.4
   wallStickTime: 0.3
-  wallFallSpeed: 10
+  wallFallSpeed: 6
 --- !u!114 &114713539500714218
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -151,7 +151,7 @@ MonoBehaviour:
   collisionLayer:
     serializedVersion: 2
     m_Bits: 256
-  tolerance: 0.99
+  tolerance: 0.98
 --- !u!212 &212889501177615960
 SpriteRenderer:
   m_ObjectHideFlags: 1

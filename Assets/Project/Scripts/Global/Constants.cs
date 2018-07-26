@@ -20,6 +20,10 @@ namespace DreamState {
 				LEFT,
 				RIGHT
 			}
+
+			public static class Collision {
+				public const string ONE_WAY_PLATFORM_TAG = "Through";
+			}
 		}
 	}
 }

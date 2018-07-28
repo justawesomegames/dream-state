@@ -132,11 +132,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   runSpeed: 10
-  jumpForce: 1000
   dashSpeed: 15
   maxDashTime: 0.4
-  wallStickTime: 0.3
-  wallFallSpeed: 6
+  jumpForce: 1000
+  wallStick:
+    wallSlideSpeed: 7
+    wallStickTimeBeforeSlide: 0.3
+    wallJump: {x: 15, y: 15}
 --- !u!114 &114713539500714218
 MonoBehaviour:
   m_ObjectHideFlags: 1

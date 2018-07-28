@@ -1,8 +1,7 @@
-using System;
-using UnityEngine;
-
 namespace DreamState {
   using Global;
+  using System;
+  using UnityEngine;
 
   [RequireComponent(typeof(PhysicsObject2D))]
   public class TestController : MonoBehaviour {
@@ -13,15 +12,17 @@ namespace DreamState {
 
     #region Internal
     private PhysicsObject2D physics;
+    private Rigidbody2D rigidBody;
     #endregion
 
     private void Awake() {
       physics = GetComponent<PhysicsObject2D>();
+      rigidBody = GetComponent<Rigidbody2D>();
     }
 
     private void Update() {
-      if (physics.Grounded() && Input.GetButton(Constants.Input.JUMP)) {
-        physics.AddForceAbsolute(Vector2.up * jumpForce);
+      if (physics.Grounded() && Input.GetButtonDown(Constants.Input.JUMP)) {
+        physics.Jump(jumpForce);
       }
       var hInput = Input.GetAxis(Global.Constants.Input.HORIZONTAL_AXIS);
       if (hInput != 0.0f) physics.Move(Vector2.right * moveSpeed * hInput);

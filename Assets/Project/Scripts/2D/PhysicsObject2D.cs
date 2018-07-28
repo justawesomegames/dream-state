@@ -1,11 +1,19 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DreamState {
+  /// <summary>
+  /// PhysicsObject2D handles 2D physics separately from the Unity physics engine
+  /// by utilizing raycasts for collision detection. By default, the PhysicsObject2D
+  /// will handle gravity and translating the object with the given inputs.
+  /// </summary>
   [RequireComponent(typeof(BoxRaycastCollider2D))]
   public class PhysicsObject2D : MonoBehaviour {
     #region Public
     public Vector2 CurrentVelocity { get { return currentVelocity; } }
+    public BoxRaycastCollider2D.CollisionInfo Collisions { get { return raycastCollider.Collisions; } }
     #endregion
 
     #region Inspector
@@ -18,6 +26,7 @@ namespace DreamState {
     private BoxRaycastCollider2D raycastCollider;
     private Vector2 currentVelocity;
     private Vector2 targetVelocity;
+    private List<PhysicsObject2DModifier> modifiers = new List<PhysicsObject2DModifier>();
     #endregion
 
     /// <summary>
@@ -52,12 +61,42 @@ namespace DreamState {
       currentVelocity.y = force * (GravityDirection() * -1);
     }
 
+    /// <summary>
+    /// Add a modifier to this physics object
+    /// </summary>
+    /// <param name="m">Modifier to add</param>
+    public void RegisterModifier(PhysicsObject2DModifier newModifier) {
+      if (modifiers.Exists(m => m.GetGuid() == newModifier.GetGuid())) {
+        Debug.LogWarning(String.Format("Modifier {0} is already registered!", newModifier.GetGuid()));
+        return;
+      }
+      newModifier.SetTarget(this);
+      modifiers.Add(newModifier);
+    }
+
+    /// <summary>
+    /// Remove a modifier from this physics object
+    /// </summary>
+    /// <param name="modifier">Modifier to remove</param>
+    public void RemoveModifier(PhysicsObject2DModifier modifier) {
+      if (!modifiers.Exists(m => m.GetGuid() == modifier.GetGuid())) {
+        Debug.LogWarning(String.Format("Modifier {0} does not exist!", modifier.GetGuid()));
+        return;
+      }
+      modifier.SetTarget(null);
+      modifiers.Remove(modifier);
+    }
+
     private void Awake() {
       raycastCollider = GetComponent<BoxRaycastCollider2D>();
     }
 
     private void Update() {
       currentVelocity = CalculateNewVelocity();
+
+      // Account for any modifiers
+      modifiers.ForEach(m => currentVelocity = m.ModifyVelocity(currentVelocity));
+
       var normalized = currentVelocity * Time.deltaTime;
       raycastCollider.UpdateCollisions(normalized);
       normalized = AdjustedVelocity(normalized);

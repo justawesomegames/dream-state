@@ -176,7 +176,7 @@ namespace DreamState {
 
       public float NearestCollision() {
         if (hits.Count < 1) return 0.0f;
-        return (from h in hits select h.distance).Min() - collider.skinWidth;
+        return hits.Select(h => h.distance).Min() - collider.skinWidth;
       }
 
       public bool IsColliding() {

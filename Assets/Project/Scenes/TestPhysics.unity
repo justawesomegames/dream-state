@@ -718,7 +718,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpForce: 20
-  moveSpeed: 6
+  moveSpeed: 10
 --- !u!114 &566157162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -731,8 +731,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravityModifier: 1
-  horizontalAcceleration: 1
-  terminalVelocity: 20
+  horizontalAcceleration: 10
+  terminalVelocity: 5
 --- !u!114 &566157163
 MonoBehaviour:
   m_ObjectHideFlags: 0

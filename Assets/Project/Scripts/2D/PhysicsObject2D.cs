@@ -5,6 +5,10 @@ namespace DreamState {
   [RequireComponent(typeof(BoxRaycastCollider2D))]
   public class PhysicsObject2D : MonoBehaviour {
     #region Public
+    public Vector2 CurrentVelocity { get { return currentVelocity; } }
+    #endregion
+
+    #region Inspector
     [SerializeField] private float gravityScalar = 1.0f;
     [SerializeField] private float horizontalAcceleration = 0.3f;
     [SerializeField] private float terminalVelocity = 0.3f;
@@ -24,12 +28,8 @@ namespace DreamState {
       return raycastCollider.Collisions.Bottom.IsColliding();
     }
 
-    public void AddForce(Vector2 force) {
-      targetVelocity = force;
-    }
-
-    public void AddForceAbsolute(Vector2 force) {
-      currentVelocity = force;
+    public void SetVerticalVelocity(float force) {
+      currentVelocity.y = force;
     }
 
     private void Awake() {
@@ -65,10 +65,9 @@ namespace DreamState {
       }
 
       // Apply gravity
-      newVelocity.y += (Physics2D.gravity.y * gravityScalar) * Time.deltaTime;
-
-      // Make sure to clamp velocity
-      newVelocity.y = Mathf.Clamp(newVelocity.y, -terminalVelocity, Mathf.Infinity);
+      if (currentVelocity.y > -terminalVelocity) {
+        newVelocity.y += Mathf.Clamp(Physics2D.gravity.y * gravityScalar * Time.deltaTime, -terminalVelocity, Mathf.Infinity);
+      }
 
       return newVelocity;
     }
@@ -79,18 +78,10 @@ namespace DreamState {
     /// <param name="velocity">Intended velocity to move</param>
     /// <returns>New velocity accounting for collisions</returns>
     private Vector2 AdjustedVelocity(Vector2 velocity) {
-      if (raycastCollider.Collisions.Top.IsColliding()) {
-        velocity.y = raycastCollider.Collisions.Top.NearestCollision();
-      }
-      if (raycastCollider.Collisions.Bottom.IsColliding()) {
-        velocity.y = -raycastCollider.Collisions.Bottom.NearestCollision();
-      }
-      if (raycastCollider.Collisions.Right.IsColliding()) {
-        velocity.x = raycastCollider.Collisions.Right.NearestCollision();
-      }
-      if (raycastCollider.Collisions.Left.IsColliding()) {
-        velocity.x = -raycastCollider.Collisions.Left.NearestCollision();
-      }
+      if (raycastCollider.Collisions.Top.IsColliding()) velocity.y = raycastCollider.Collisions.Top.NearestCollision();
+      if (raycastCollider.Collisions.Bottom.IsColliding()) velocity.y = -raycastCollider.Collisions.Bottom.NearestCollision();
+      if (raycastCollider.Collisions.Right.IsColliding()) velocity.x = raycastCollider.Collisions.Right.NearestCollision();
+      if (raycastCollider.Collisions.Left.IsColliding()) velocity.x = -raycastCollider.Collisions.Left.NearestCollision();
       return velocity;
     }
   }

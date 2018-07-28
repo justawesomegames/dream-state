@@ -11,9 +11,9 @@ namespace DreamState {
     }
 
     private void Update() {
-      player.Move(Input.GetAxis(Global.Constants.Input.HORIZONTAL_AXIS));
+      player.HorizontalMove(Input.GetAxis(Global.Constants.Input.HORIZONTAL_AXIS));
       player.Jump(Input.GetButton(Global.Constants.Input.JUMP));
-      player.Dash(Input.GetButton(Global.Constants.Input.DASH));
+      // player.Dash(Input.GetButton(Global.Constants.Input.DASH));
     }
   }
 }

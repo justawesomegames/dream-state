@@ -21,7 +21,7 @@ namespace DreamState {
         if (wallStick.StickingToWall) {
           wallStick.JumpOffWall();
         } else if(physics.Grounded()) {
-          physics.AddForceAbsolute(Vector2.up * jumpForce);
+          physics.SetVelocity(Vector2.up * jumpForce);
         }
       }
       var hInput = Input.GetAxis(Global.Constants.Input.HORIZONTAL_AXIS);

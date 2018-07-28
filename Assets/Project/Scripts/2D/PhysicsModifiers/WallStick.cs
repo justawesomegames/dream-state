@@ -44,7 +44,7 @@ namespace DreamState {
     }
 
     public void JumpOffWall() {
-      target.AddForceAbsolute(-new Vector2(wallJump.x * Mathf.Sign(target.LastTargetVelocity.x), wallJump.y * target.GravityDirection()));
+      target.SetVelocity(-new Vector2(wallJump.x * Mathf.Sign(target.LastTargetVelocity.x), wallJump.y * target.GravityDirection()));
     }
   }
 }

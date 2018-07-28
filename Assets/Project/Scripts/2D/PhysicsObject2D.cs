@@ -50,15 +50,13 @@ namespace DreamState {
     }
 
     /// <summary>
-    /// Immediately apply a vertical force to the object if possible
+    /// Immediately set the current velocity
     /// </summary>
-    /// <param name="force">Force to apply</param>
-    public void AddForceAbsolute(Vector2 force) {
-      if (force.y != 0) {
-        currentVelocity.y = force.y * (GravityDirection() * -1);
-      }
-      if (force.x != 0) {
-        currentVelocity.x = force.x;
+    /// <param name="velocity">Velocity to set to</param>
+    public void SetVelocity(Vector2 velocity) {
+      currentVelocity.y = velocity.y * (GravityDirection() * -1);
+      if (velocity.x != 0) {
+        currentVelocity.x = velocity.x;
       }
     }
 
@@ -92,6 +90,11 @@ namespace DreamState {
 
     private void Awake() {
       raycastCollider = GetComponent<BoxRaycastCollider2D>();
+
+      var layerMask = raycastCollider.CollisionMask.value;
+      if (layerMask == (layerMask | (1 << gameObject.layer))) {
+        Debug.LogError(String.Format("GameObject {0} should not be on the same layer as the raycast collision mask!", gameObject.name));
+      }
     }
 
     private void Update() {

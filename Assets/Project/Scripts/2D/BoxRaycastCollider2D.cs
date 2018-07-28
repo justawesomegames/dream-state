@@ -13,6 +13,7 @@ namespace DreamState {
       if (_collisions == null) _collisions = new CollisionInfo(this);
       return _collisions;
     } }
+    [HideInInspector] public LayerMask CollisionMask { get { return collisionMask; } }
     
     [SerializeField] private LayerMask collisionMask;
     [SerializeField] private float skinWidth = 0.015f;

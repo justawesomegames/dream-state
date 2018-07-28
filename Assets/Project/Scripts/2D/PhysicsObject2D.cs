@@ -80,8 +80,13 @@ namespace DreamState {
 
       // Apply gravity
       newVelocity += Physics2D.gravity * gravityModifier * Time.deltaTime;
-      if (newVelocity.y < -terminalVelocity) {
+
+      // Handle terminal velocity
+      var gravityDir = GravityDirection();
+      if (newVelocity.y < -terminalVelocity && gravityDir == -1) {
         newVelocity.y = -terminalVelocity;
+      } else if (newVelocity.y > terminalVelocity && gravityDir == 1) {
+        newVelocity.y = terminalVelocity;
       }
 
       // Horizontal velocity

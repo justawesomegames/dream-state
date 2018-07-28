@@ -22,7 +22,7 @@ namespace DreamState {
 
     private void Update() {
       if (physics.Grounded() && Input.GetButtonDown(Constants.Input.JUMP)) {
-        physics.SetVerticalVelocity(jumpForce);
+        physics.Jump(jumpForce);
       }
       var hInput = Input.GetAxis(Global.Constants.Input.HORIZONTAL_AXIS);
       if (hInput != 0.0f) physics.Move(Vector2.right * moveSpeed * hInput);

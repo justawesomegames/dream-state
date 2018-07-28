@@ -9,7 +9,7 @@ namespace DreamState {
     #endregion
 
     #region Inspector
-    [SerializeField] private float gravityScalar = 1.0f;
+    [SerializeField] private float gravityModifier = 1.0f;
     [SerializeField] private float horizontalAcceleration = 0.3f;
     [SerializeField] private float terminalVelocity = 0.3f;
     #endregion
@@ -20,16 +20,36 @@ namespace DreamState {
     private Vector2 targetVelocity;
     #endregion
 
+    /// <summary>
+    /// Move object at a speed
+    /// </summary>
+    /// <param name="moveAmount">Speed to move object</param>
     public void Move(Vector2 moveAmount) {
       targetVelocity = moveAmount;
     }
 
+    /// <summary>
+    /// Based on current gravity direction, check top or bottom collider for collision
+    /// </summary>
+    /// <returns>True if object is grounded, false otherwise</returns>
     public bool Grounded() {
-      return raycastCollider.Collisions.Bottom.IsColliding();
+      return GravityDirection() == -1 ? raycastCollider.Collisions.Bottom.IsColliding() : raycastCollider.Collisions.Top.IsColliding();
     }
 
-    public void SetVerticalVelocity(float force) {
-      currentVelocity.y = force;
+    /// <summary>
+    /// Get current gravity direction
+    /// </summary>
+    /// <returns>-1.0 for downwards, 1.0 for upwards</returns>
+    public float GravityDirection() {
+      return Mathf.Sign(Physics2D.gravity.y * gravityModifier);
+    }
+
+    /// <summary>
+    /// Immediately apply a vertical force to the object
+    /// </summary>
+    /// <param name="force">Force to apply</param>
+    public void Jump(float force) {
+      currentVelocity.y = force * (GravityDirection() * -1);
     }
 
     private void Awake() {
@@ -37,11 +57,12 @@ namespace DreamState {
     }
 
     private void Update() {
-      var newVelocity = CalculateNewVelocity();
-      raycastCollider.UpdateCollisions(newVelocity);
-      newVelocity = AdjustedVelocity(newVelocity);
-      currentVelocity = newVelocity;
-      transform.Translate(currentVelocity);
+      currentVelocity = CalculateNewVelocity();
+      var normalized = currentVelocity * Time.deltaTime;
+      raycastCollider.UpdateCollisions(normalized);
+      normalized = AdjustedVelocity(normalized);
+      transform.Translate(normalized);
+      currentVelocity = ZeroOutCollisions(currentVelocity);
 
       // TODO: Handle slopes
       // TODO: Handle moving platforms
@@ -57,16 +78,17 @@ namespace DreamState {
     private Vector2 CalculateNewVelocity() {
       Vector2 newVelocity = currentVelocity;
 
+      // Apply gravity
+      newVelocity += Physics2D.gravity * gravityModifier * Time.deltaTime;
+      if (newVelocity.y < -terminalVelocity) {
+        newVelocity.y = -terminalVelocity;
+      }
+
       // Horizontal velocity
       if (currentVelocity.x < targetVelocity.x) {
         newVelocity.x = Mathf.Min(newVelocity.x + horizontalAcceleration, targetVelocity.x);
       } else if (currentVelocity.x > targetVelocity.x) {
         newVelocity.x = Mathf.Max(newVelocity.x - horizontalAcceleration, targetVelocity.x);
-      }
-
-      // Apply gravity
-      if (currentVelocity.y > -terminalVelocity) {
-        newVelocity.y += Mathf.Clamp(Physics2D.gravity.y * gravityScalar * Time.deltaTime, -terminalVelocity, Mathf.Infinity);
       }
 
       return newVelocity;
@@ -82,6 +104,17 @@ namespace DreamState {
       if (raycastCollider.Collisions.Bottom.IsColliding()) velocity.y = -raycastCollider.Collisions.Bottom.NearestCollision();
       if (raycastCollider.Collisions.Right.IsColliding()) velocity.x = raycastCollider.Collisions.Right.NearestCollision();
       if (raycastCollider.Collisions.Left.IsColliding()) velocity.x = -raycastCollider.Collisions.Left.NearestCollision();
+      return velocity;
+    }
+
+    /// <summary>
+    /// Check each edge of the collider and set velocity to 0 if colliding
+    /// </summary>
+    /// <param name="velocity">Velocity to zero out</param>
+    /// <returns>New velocity potentially zeroed out</returns>
+    private Vector2 ZeroOutCollisions(Vector2 velocity) {
+      if (raycastCollider.Collisions.Top.IsColliding() || raycastCollider.Collisions.Bottom.IsColliding()) velocity.y = 0;
+      if (raycastCollider.Collisions.Left.IsColliding() || raycastCollider.Collisions.Right.IsColliding()) velocity.x = 0;
       return velocity;
     }
   }

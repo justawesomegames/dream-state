@@ -11,24 +11,20 @@ namespace DreamState {
   /// </summary>
   [RequireComponent(typeof(BoxRaycastCollider2D))]
   public class PhysicsObject2D : MonoBehaviour {
-    #region Public
     public Vector2 CurrentVelocity { get { return currentVelocity; } }
+    public Vector2 LastTargetVelocity { get { return lastTargetVelocity; } }
     public BoxRaycastCollider2D.CollisionInfo Collisions { get { return raycastCollider.Collisions; } }
-    #endregion
-
-    #region Inspector
+    
     [SerializeField] private float gravityModifier = 1.0f;
-    [SerializeField] private float horizontalAcceleration = 0.3f;
-    [SerializeField] private float terminalVelocity = 0.3f;
-    #endregion
-
-    #region Internal
+    [SerializeField] private float horizontalAcceleration = 2f;
+    [SerializeField] private float terminalVelocity = 20f;
+    
     private BoxRaycastCollider2D raycastCollider;
     private Vector2 currentVelocity;
     private Vector2 targetVelocity;
+    private Vector2 lastTargetVelocity;
     private List<PhysicsObject2DModifier> modifiers = new List<PhysicsObject2DModifier>();
-    #endregion
-
+    
     /// <summary>
     /// Move object at a speed
     /// </summary>
@@ -54,24 +50,31 @@ namespace DreamState {
     }
 
     /// <summary>
-    /// Immediately apply a vertical force to the object
+    /// Immediately apply a vertical force to the object if possible
     /// </summary>
     /// <param name="force">Force to apply</param>
-    public void Jump(float force) {
-      currentVelocity.y = force * (GravityDirection() * -1);
+    public void AddForceAbsolute(Vector2 force) {
+      if (force.y != 0) {
+        currentVelocity.y = force.y * (GravityDirection() * -1);
+      }
+      if (force.x != 0) {
+        currentVelocity.x = force.x;
+      }
     }
 
     /// <summary>
     /// Add a modifier to this physics object
     /// </summary>
     /// <param name="m">Modifier to add</param>
-    public void RegisterModifier(PhysicsObject2DModifier newModifier) {
+    /// <returns>Guid of modifier</returns>
+    public string RegisterModifier(PhysicsObject2DModifier newModifier) {
       if (modifiers.Exists(m => m.GetGuid() == newModifier.GetGuid())) {
         Debug.LogWarning(String.Format("Modifier {0} is already registered!", newModifier.GetGuid()));
-        return;
+        return String.Empty;
       }
       newModifier.SetTarget(this);
       modifiers.Add(newModifier);
+      return newModifier.GetGuid();
     }
 
     /// <summary>
@@ -107,6 +110,7 @@ namespace DreamState {
       // TODO: Handle moving platforms
 
       // Reset target velocity
+      lastTargetVelocity = targetVelocity;
       targetVelocity = Vector2.zero;
     }
 

@@ -10,7 +10,6 @@ namespace DreamState {
     protected PhysicsObject2D target;
     private string guid;
 
-    #region Abstract functions
     /// <summary>
     /// Modify velocity after physics has applied gravity and acceleration
     /// </summary>
@@ -22,8 +21,7 @@ namespace DreamState {
     /// Should this modifier be unique?
     /// </summary>
     /// <returns>If modifier is unique</returns>
-    public abstract bool IsUnique();
-    #endregion
+    public abstract bool IsUniqueModifier();
 
     /// <summary>
     /// Set the physics object that this modifier will act upon
@@ -35,7 +33,7 @@ namespace DreamState {
 
     public string GetGuid() {
       if (guid == null) {
-        if (IsUnique()) {
+        if (IsUniqueModifier()) {
           guid = GetType().Name;
         } else {
           guid = Guid.NewGuid().ToString();

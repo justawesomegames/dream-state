@@ -7,7 +7,6 @@ namespace DreamState
   [RequireComponent(typeof(Animator))]
   [RequireComponent(typeof(EdgeRaycastCollider))]
   public abstract class MovableCharacter : MonoBehaviour {
-    #region Public
     [Header("Movement")]
     [SerializeField] protected float runSpeed = 10f;
     [SerializeField] protected float jumpForce = 800f;
@@ -17,9 +16,7 @@ namespace DreamState
     [Header("Wall")]
     [SerializeField] protected float wallStickTime = 0.3f;
     [SerializeField] protected float wallFallSpeed = 6f;
-    #endregion
-
-    #region Internal
+    
     protected Rigidbody2D rigidBody;
     protected BoxCollider2D boxCollider;
     protected Animator animator;
@@ -36,13 +33,10 @@ namespace DreamState
     protected bool stickingToWall;
 
     protected bool grounded { get { return raycastCollider.Bottom.IsColliding(); } }
-    #endregion
 
-    #region Virtual functions
     protected virtual void OnAwake() {}
     protected virtual void OnUpdate() {}
-    #endregion
-
+    
     public void Move(float moveScalar) {
       curMoveScalar = moveScalar;
     }

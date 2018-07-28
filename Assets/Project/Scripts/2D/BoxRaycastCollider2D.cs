@@ -8,30 +8,24 @@ namespace DreamState {
 
   [RequireComponent(typeof(BoxCollider2D))]
   public class BoxRaycastCollider2D : MonoBehaviour {
-    #region Public
     [HideInInspector] public CollisionInfo Collisions { get {
       // Singleton
       if (_collisions == null) _collisions = new CollisionInfo(this);
       return _collisions;
     } }
-    #endregion
-
-    #region Inspector
+    
     [SerializeField] private LayerMask collisionMask;
     [SerializeField] private float skinWidth = 0.015f;
     [SerializeField] private float distanceBetweenRays = 0.25f;
     [SerializeField] private int horizontalRayCount = 3;
     [SerializeField] private int verticalRayCount = 3;
-    #endregion
-
-    #region Internal
+    
     private CollisionInfo _collisions;
     private BoxCollider2D boxCollider;
     private RaycastOrigins raycastOrigins;
     private float horizontalRaySpacing;
     private float verticalRaySpacing;
-    #endregion
-
+    
     private void Awake() {
       boxCollider = GetComponent<BoxCollider2D>();
     }

@@ -5,14 +5,12 @@ namespace DreamState {
   [RequireComponent(typeof(Transform))]
   [RequireComponent(typeof(BoxCollider2D))]
   public class EdgeRaycastCollider : MonoBehaviour {
-    #region Public
     [SerializeField] private LayerMask collisionLayer;
     [SerializeField] [Range(0.0f, 1.0f)] private float tolerance = 0.98f;
     public EdgeCollider Top;
     public EdgeCollider Bottom;
     public EdgeCollider Left;
     public EdgeCollider Right;
-    #endregion
 
     private void Awake() {
       Top = new EdgeCollider(

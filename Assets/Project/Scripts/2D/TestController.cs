@@ -5,15 +5,11 @@ using UnityEngine;
 namespace DreamState {
   [RequireComponent(typeof(PhysicsObject2D))]
   public class TestController : MonoBehaviour {
-    #region Public
-    [SerializeField] private float jumpForce = 0.1f;
-    [SerializeField] private float moveSpeed = 0.2f;
+    [SerializeField] private float jumpForce = 20f;
+    [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private WallStick wallStick;
-    #endregion
-
-    #region Internal
+    
     private PhysicsObject2D physics;
-    #endregion
 
     private void Awake() {
       physics = GetComponent<PhysicsObject2D>();
@@ -21,8 +17,12 @@ namespace DreamState {
     }
 
     private void Update() {
-      if (physics.Grounded() && Input.GetButtonDown(Constants.Input.JUMP)) {
-        physics.Jump(jumpForce);
+      if (Input.GetButtonDown(Constants.Input.JUMP)) {
+        if (wallStick.StickingToWall) {
+          wallStick.JumpOffWall();
+        } else if(physics.Grounded()) {
+          physics.AddForceAbsolute(Vector2.up * jumpForce);
+        }
       }
       var hInput = Input.GetAxis(Global.Constants.Input.HORIZONTAL_AXIS);
       if (hInput != 0.0f) physics.Move(Vector2.right * moveSpeed * hInput);

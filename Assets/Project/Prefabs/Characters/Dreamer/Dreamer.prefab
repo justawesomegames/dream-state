@@ -23,10 +23,11 @@ GameObject:
   - component: {fileID: 50175537036692076}
   - component: {fileID: 212889501177615960}
   - component: {fileID: 95930526847204934}
-  - component: {fileID: 114422877688425760}
-  - component: {fileID: 114455658018678486}
-  - component: {fileID: 114713539500714218}
-  m_Layer: 8
+  - component: {fileID: 114129786370640692}
+  - component: {fileID: 114645009632150360}
+  - component: {fileID: 114432909431342044}
+  - component: {fileID: 114619582732366908}
+  m_Layer: 9
   m_Name: Dreamer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +41,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1778227753367288}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.166, y: -2.71, z: 0}
+  m_LocalPosition: {x: -2.26, y: 6.67, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -53,9 +54,9 @@ Rigidbody2D:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1778227753367288}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
-  m_UseFullKinematicContacts: 0
+  m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
@@ -109,7 +110,21 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &114422877688425760
+--- !u!114 &114129786370640692
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1778227753367288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c311244c58d90604fb84e2bc6ae20aad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gravityModifier: 1
+  horizontalAcceleration: 3
+  terminalVelocity: 20
+--- !u!114 &114432909431342044
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -120,7 +135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96ac495701f624b9281967984b761ffc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114455658018678486
+--- !u!114 &114619582732366908
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -134,12 +149,13 @@ MonoBehaviour:
   runSpeed: 10
   dashSpeed: 15
   maxDashTime: 0.4
-  jumpForce: 1000
+  jumpForce: 20
   wallStick:
     wallSlideSpeed: 7
     wallStickTimeBeforeSlide: 0.3
     wallJump: {x: 15, y: 15}
---- !u!114 &114713539500714218
+    dashWallJump: {x: 20, y: 20}
+--- !u!114 &114645009632150360
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -147,13 +163,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1778227753367288}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e61d9896fdf664841b16b20ca8b73375, type: 3}
+  m_Script: {fileID: 11500000, guid: 7df93515547309641ba7a8fa70d77d80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  collisionLayer:
+  collisionMask:
     serializedVersion: 2
     m_Bits: 256
-  tolerance: 0.98
+  skinWidth: 0.015
+  distanceBetweenRays: 0.25
+  horizontalRayCount: 3
+  verticalRayCount: 3
 --- !u!212 &212889501177615960
 SpriteRenderer:
   m_ObjectHideFlags: 1

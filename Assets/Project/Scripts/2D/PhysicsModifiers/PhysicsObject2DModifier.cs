@@ -7,6 +7,16 @@ namespace DreamState {
   /// of the standard PhysicsObject2D handling.
   /// </summary>
   public abstract class PhysicsObject2DModifier {
+    public string Guid { get {
+      if (guid == String.Empty) {
+        if (IsUniqueModifier()) {
+          guid = GetType().Name;
+        } else {
+          guid = System.Guid.NewGuid().ToString();
+        }
+      }
+      return guid;
+    } }
     protected PhysicsObject2D target;
     private string guid;
 
@@ -29,17 +39,6 @@ namespace DreamState {
     /// <param name="o"></param>
     public void SetTarget(PhysicsObject2D o) {
       target = o;
-    }
-
-    public string GetGuid() {
-      if (guid == null) {
-        if (IsUniqueModifier()) {
-          guid = GetType().Name;
-        } else {
-          guid = Guid.NewGuid().ToString();
-        }
-      }
-      return guid;
     }
   }
 }

@@ -9,6 +9,7 @@ namespace DreamState {
     [SerializeField] private float wallSlideSpeed = 7f;
     [SerializeField] private float wallStickTimeBeforeSlide = 0.3f;
     [SerializeField] private Vector2 wallJump = new Vector2(15f, 15f);
+    [SerializeField] private Vector2 dashWallJump = new Vector2(20f, 20f);
     
     private bool stickingToWall = false;
     private float wallStickTime = 0.0f;
@@ -16,13 +17,14 @@ namespace DreamState {
     public override Vector2 ModifyVelocity(Vector2 v) {
       if (v.x == 0.0f) {
         stickingToWall = false;
-        return v; 
+        return v;
       }
 
+      var gDir = target.GravityDirection();
       stickingToWall = (target.LastTargetVelocity.x < 0.0f && target.Collisions.Left.IsColliding() ||
                         target.LastTargetVelocity.x > 0.0f && target.Collisions.Right.IsColliding()) &&
                         !target.Grounded() &&
-                        v.y <= 0.0f;
+                        ((gDir == -1 && v.y <= 0.0f) || (gDir == 1 && v.y >= 0.0f));
 
       if (!stickingToWall) {
         wallStickTime = 0.0f;
@@ -33,7 +35,7 @@ namespace DreamState {
       if (wallStickTime < wallStickTimeBeforeSlide) {
         v.y = 0;
       } else {
-        v.y = wallSlideSpeed * target.GravityDirection();
+        v.y = wallSlideSpeed * gDir;
       }
 
       return v;
@@ -43,8 +45,10 @@ namespace DreamState {
       return true;
     }
 
-    public void JumpOffWall() {
-      target.SetVelocity(-new Vector2(wallJump.x * Mathf.Sign(target.LastTargetVelocity.x), wallJump.y * target.GravityDirection()));
+    public void JumpOffWall(bool dashing) {
+      stickingToWall = false;
+      var v = dashing ? dashWallJump : wallJump;
+      target.SetVelocity(-new Vector2(v.x * Mathf.Sign(target.LastTargetVelocity.x), v.y * target.GravityDirection()));
     }
   }
 }

@@ -66,13 +66,13 @@ namespace DreamState {
     /// <param name="m">Modifier to add</param>
     /// <returns>Guid of modifier</returns>
     public string RegisterModifier(PhysicsObject2DModifier newModifier) {
-      if (modifiers.Exists(m => m.GetGuid() == newModifier.GetGuid())) {
-        Debug.LogWarning(String.Format("Modifier {0} is already registered!", newModifier.GetGuid()));
+      if (modifiers.Exists(m => m.Guid == newModifier.Guid)) {
+        Debug.LogWarning(String.Format("Modifier {0} is already registered!", newModifier.Guid));
         return String.Empty;
       }
       newModifier.SetTarget(this);
       modifiers.Add(newModifier);
-      return newModifier.GetGuid();
+      return newModifier.Guid;
     }
 
     /// <summary>
@@ -80,8 +80,8 @@ namespace DreamState {
     /// </summary>
     /// <param name="modifier">Modifier to remove</param>
     public void RemoveModifier(PhysicsObject2DModifier modifier) {
-      if (!modifiers.Exists(m => m.GetGuid() == modifier.GetGuid())) {
-        Debug.LogWarning(String.Format("Modifier {0} does not exist!", modifier.GetGuid()));
+      if (!modifiers.Exists(m => m.Guid == modifier.Guid)) {
+        Debug.LogWarning(String.Format("Modifier {0} does not exist!", modifier.Guid));
         return;
       }
       modifier.SetTarget(null);

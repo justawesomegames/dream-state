@@ -12,8 +12,26 @@ namespace DreamState {
 
     private void Update() {
       player.HorizontalMove(Input.GetAxis(Global.Constants.Input.HORIZONTAL_AXIS));
-      player.Jump(Input.GetButton(Global.Constants.Input.JUMP));
-      // player.Dash(Input.GetButton(Global.Constants.Input.DASH));
+
+      if (Input.GetButtonDown(Global.Constants.Input.JUMP)) {
+        player.OnJumpPress();
+      }
+      if (Input.GetButton(Global.Constants.Input.JUMP)) {
+        player.OnJumpHold();
+      }
+      if (Input.GetButtonUp(Global.Constants.Input.JUMP)) {
+        player.OnJumpRelease();
+      }
+
+      if (Input.GetButtonDown(Global.Constants.Input.DASH)) {
+        player.OnDashPress();
+      }
+      if (Input.GetButton(Global.Constants.Input.DASH)) {
+        player.OnDashHold();
+      }
+      if (Input.GetButtonUp(Global.Constants.Input.DASH)) {
+        player.OnDashRelease();
+      }
     }
   }
 }

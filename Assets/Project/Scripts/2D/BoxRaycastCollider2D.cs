@@ -67,6 +67,8 @@ namespace DreamState {
       Vector2 v = moveVector;
       if (v.x != 0) v = UpdateHorizontalCollisions(v);
       if (v.y != 0) UpdateVerticalCollisions(v);
+
+      PostUpdate();
     }
 
     private Vector2 UpdateVerticalCollisions(Vector2 moveVector) {
@@ -76,8 +78,6 @@ namespace DreamState {
         Vector2 rayOrigin = yDir == -1 ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
         rayOrigin += Vector2.right * (verticalRaySpacing * i + moveVector.x);
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * yDir, rayLength, collisionMask);
-
-        Debug.DrawRay(rayOrigin, Vector2.up * yDir, Color.red);
 
         // Check if there was actually a collision
         if (!hit) continue;
@@ -90,9 +90,9 @@ namespace DreamState {
 
         // Add collision to the appropriate collider
         if (yDir == -1) {
-          Collisions.Bottom.hits.Add(hit);
+          Collisions.Bottom.AddHit(hit);
         } else {
-          Collisions.Top.hits.Add(hit);
+          Collisions.Top.AddHit(hit);
         }
       }
 
@@ -123,9 +123,9 @@ namespace DreamState {
 
         // Add collision to the appropriate collider
         if (xDir == -1) {
-          Collisions.Left.hits.Add(hit);
+          Collisions.Left.AddHit(hit);
         } else {
-          Collisions.Right.hits.Add(hit);
+          Collisions.Right.AddHit(hit);
         }
       }
 
@@ -137,6 +137,13 @@ namespace DreamState {
       Collisions.Bottom.Clear();
       Collisions.Left.Clear();
       Collisions.Right.Clear();
+    }
+
+    private void PostUpdate() {
+      Collisions.Top.PostUpdate();
+      Collisions.Bottom.PostUpdate();
+      Collisions.Left.PostUpdate();
+      Collisions.Right.PostUpdate();
     }
 
     public struct RaycastOrigins {
@@ -161,12 +168,19 @@ namespace DreamState {
     }
 
     public class EdgeCollisionInfo {
-      public List<RaycastHit2D> hits;
+      private List<RaycastHit2D> hits;
       private BoxRaycastCollider2D collider;
+      private List<Action<bool>> callbacks;
+      private bool lastCollisionState;
       
       public EdgeCollisionInfo(BoxRaycastCollider2D c) {
         collider = c;
         hits = new List<RaycastHit2D>();
+        callbacks = new List<Action<bool>>();
+      }
+
+      public void AddHit(RaycastHit2D hit) {
+        hits.Add(hit);
       }
 
       public float NearestCollision() {
@@ -180,6 +194,21 @@ namespace DreamState {
 
       public void Clear() {
         hits.Clear();
+      }
+
+      public void PostUpdate() {
+        var colliding = IsColliding();
+
+        // If collision state changed on this update, notify subscribers
+        if (colliding != lastCollisionState) {
+          callbacks.ForEach(c => c(colliding));
+        }
+
+        lastCollisionState = colliding;
+      }
+
+      public void RegisterCallback(Action<bool> callback) {
+        callbacks.Add(callback);
       }
     }
   }

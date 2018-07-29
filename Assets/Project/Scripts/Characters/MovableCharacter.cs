@@ -1,172 +1,108 @@
+using DreamState.Global;
+using System;
 using UnityEngine;
 
-namespace DreamState
-{
+namespace DreamState {
+  [DisallowMultipleComponent]
+  [RequireComponent(typeof(PhysicsObject2D))]
   [RequireComponent(typeof(Rigidbody2D))]
-  [RequireComponent(typeof(BoxCollider2D))]
   [RequireComponent(typeof(Animator))]
-  [RequireComponent(typeof(EdgeRaycastCollider))]
+  [RequireComponent(typeof(SpriteRenderer))]
   public abstract class MovableCharacter : MonoBehaviour {
-    #region Public
     [Header("Movement")]
     [SerializeField] protected float runSpeed = 10f;
-    [SerializeField] protected float jumpForce = 800f;
     [SerializeField] protected float dashSpeed = 15f;
     [SerializeField] protected float maxDashTime = 0.4f;
+    [SerializeField] protected float jumpForce = 20f;
+    [SerializeField] protected WallStick wallStick;
 
-    [Header("Wall")]
-    [SerializeField] protected float wallStickTime = 0.3f;
-    [SerializeField] protected float wallFallSpeed = 6f;
-    #endregion
-
-    #region Internal
+    protected PhysicsObject2D physics;
     protected Rigidbody2D rigidBody;
-    protected BoxCollider2D boxCollider;
     protected Animator animator;
-    protected EdgeRaycastCollider raycastCollider;
-    protected float curMoveScalar;
-    protected bool jumping;
-    protected bool releasedJump;
-    protected bool releasedDash;
-    protected Global.Constants.FacingDirection curFacingDir;
-    protected bool dashing;
-    protected float dashTime;
-    protected float xVelocityInAir;
-    protected float curWallStickTime;
-    protected bool stickingToWall;
+    protected SpriteRenderer spriteRenderer;
 
-    protected bool grounded { get { return raycastCollider.Bottom.IsColliding(); } }
-    #endregion
+    private float curDashTime;
+    private bool holdingDash;
+    private float curMoveSpeed;
 
-    #region Virtual functions
-    protected virtual void OnAwake() {}
-    protected virtual void OnUpdate() {}
-    #endregion
-
-    public void Move(float moveScalar) {
-      curMoveScalar = moveScalar;
+    public void HorizontalMove(float moveScalar) {
+      var newMove = Vector2.right * curMoveSpeed * moveScalar;
+      if (newMove.x != 0.0f) {
+        physics.Move(newMove);
+        spriteRenderer.flipX = newMove.x < 0.0f;
+      }
     }
 
-    public void Dash(bool dash) {
-      dashing = dash;
+    public virtual void OnJumpPress() {
+      if (physics.Grounded()) {
+        curMoveSpeed = Dashing() ? dashSpeed : runSpeed;
+        physics.SetVelocity(Vector2.up * jumpForce);
+      } else if (wallStick.StickingToWall) {
+        curMoveSpeed = holdingDash ? dashSpeed : runSpeed;
+        wallStick.JumpOffWall(holdingDash);
+      }
     }
 
-    public void Jump(bool jump) {
-      jumping = jump;
+    public virtual void OnJumpHold() { }
+
+    public virtual void OnJumpRelease() {
+      var gDir = physics.GravityDirection();
+      if ((gDir == -1 && physics.CurrentVelocity.y > 0.0f || gDir == 1 && physics.CurrentVelocity.y < 0.0f)) {
+        physics.SetVelocity(Vector2.zero);  
+      }
     }
 
-    protected void Awake() {
-      rigidBody = GetComponent<Rigidbody2D>();
-      boxCollider = GetComponent<BoxCollider2D>();
-      animator = GetComponent<Animator>();
-      raycastCollider = GetComponent<EdgeRaycastCollider>();
-      curFacingDir = Global.Constants.FacingDirection.RIGHT;
-      xVelocityInAir = runSpeed;
+    public virtual void OnDashPress() { }
 
-      // Register collision events
-      raycastCollider.Bottom.RegisterOnChange(groundedChange);
-
-      OnAwake();
-    }
-
-    protected void FixedUpdate() {
-      // Handle horizontal movement
-      var newVelocity = new Vector2((grounded ? runSpeed : xVelocityInAir) * curMoveScalar, rigidBody.velocity.y);
-
-      // Handle ground dashing
-      if (dashing) {
-        dashTime += Time.deltaTime;
-        if (dashTime < maxDashTime && grounded && releasedDash) {
-          // Can continue dashing
-          newVelocity.x = dashSpeed;
-          animator.SetBool("Dashing", true);
-          if (curFacingDir == Global.Constants.FacingDirection.LEFT) {
-            newVelocity.x *= -1;
-          }
-        } else {
-          // Trying to dash, but already reached max dash time
-          animator.SetBool("Dashing", false);
-          releasedDash = false;
-        }
-      } else if(dashTime > 0) {
-        dashTime = 0.0f;
+    public virtual void OnDashHold() {
+      holdingDash = true;
+      curDashTime += Time.deltaTime;
+      if (Dashing() && physics.Grounded()) {
+        animator.SetBool("Dashing", true);
+        physics.Move((spriteRenderer.flipX ? Vector2.left : Vector2.right) * dashSpeed);
+      } else {
         animator.SetBool("Dashing", false);
       }
-
-      // Handle which direction character should be facing
-      if (curFacingDir == Global.Constants.FacingDirection.LEFT && curMoveScalar > 0.0f) {
-        setFacingDir(Global.Constants.FacingDirection.RIGHT);
-      } else if (curFacingDir == Global.Constants.FacingDirection.RIGHT && curMoveScalar < 0.0f) {
-        setFacingDir(Global.Constants.FacingDirection.LEFT);
-      }
-
-      // Immediately kill y-velocity if character wants to stop jumping
-      if (!jumping && rigidBody.velocity.y > 0.0f) {
-        newVelocity.y = 0.0f;
-      }
-
-      // Handle jumping from grounded
-      if (grounded && jumping && releasedJump) {
-        releasedJump = false;
-        releasedDash = false;
-        rigidBody.AddForce(new Vector2(0.0f, jumpForce));
-      }
-
-      // To avoid bounce, keep track of if character released jump before landing
-      if (grounded && !jumping && !releasedJump) {
-        releasedJump = true;
-      }
-
-      // Avoid dashing after being aerial when button held
-      if (!grounded && dashing && releasedDash) {
-        releasedDash = false;
-      }
-      else if (grounded && !dashing && !releasedDash) {
-        releasedDash = true;
-      }
-
-      // Determine if character is sticking to a wall
-      stickingToWall = ((raycastCollider.Left.IsColliding() && curMoveScalar < 0) || (raycastCollider.Right.IsColliding() && curMoveScalar > 0)) &&
-                       rigidBody.velocity.y <= 0.0f && !grounded;
-      animator.SetBool("StickingToWall", stickingToWall);
-
-      if (stickingToWall) {
-        curWallStickTime += Time.deltaTime;
-        if (curWallStickTime < wallStickTime) {
-          newVelocity.y = 0.0f;
-        } else {
-          newVelocity.y = -wallFallSpeed;
-        }
-      } else {
-        curWallStickTime = 0.0f;
-      }
-
-      // Set new velocity
-      rigidBody.velocity = newVelocity;
-      animator.SetFloat("xSpeed", Mathf.Abs(newVelocity.x));
-      animator.SetFloat("ySpeed", newVelocity.y);
-
-      OnUpdate();
-    }
-  
-    private void setFacingDir(Global.Constants.FacingDirection dir) {
-      Vector3 newScale = transform.localScale;
-      switch (dir) {
-        case Global.Constants.FacingDirection.RIGHT:
-          newScale.x = 1;
-          break;
-        case Global.Constants.FacingDirection.LEFT:
-          newScale.x = -1;
-          break;
-      }
-      curFacingDir = dir;
-      transform.localScale = newScale;
     }
 
-    private void groundedChange(bool newGrounded) {
-      animator.SetBool("Grounded", newGrounded);
-      if (!newGrounded) {
-        xVelocityInAir = dashing && dashTime < maxDashTime ? dashSpeed : runSpeed;
+    public virtual void OnDashRelease() {
+      holdingDash = false;
+      curDashTime = 0.0f;
+      animator.SetBool("Dashing", false);
+    }
+
+    protected bool Dashing() {
+      return holdingDash && curDashTime < maxDashTime;
+    }
+
+    private void OnGroundedChange(bool newGrounded) {
+      if (newGrounded) {
+        curMoveSpeed = runSpeed;
+      }
+    }
+
+    private void Awake() {
+      physics = GetComponent<PhysicsObject2D>();
+      rigidBody = GetComponent<Rigidbody2D>();
+      animator = GetComponent<Animator>();
+      spriteRenderer = GetComponent<SpriteRenderer>();
+
+      physics.RegisterModifier(wallStick);
+      physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
+
+      curMoveSpeed = runSpeed;
+    }
+
+    private void Update() {
+      animator.SetBool("Grounded", physics.Grounded());
+      animator.SetFloat("xSpeed", Mathf.Abs(physics.CurrentVelocity.x));
+      animator.SetFloat("ySpeed", physics.CurrentVelocity.y);
+      animator.SetBool("StickingToWall", wallStick.StickingToWall);
+
+      spriteRenderer.flipY = physics.GravityDirection() == 1;
+
+      if (wallStick.StickingToWall) {
+        curMoveSpeed = runSpeed;
       }
     }
   }

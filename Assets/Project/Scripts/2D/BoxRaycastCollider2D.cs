@@ -8,27 +8,25 @@ namespace DreamState {
 
   [RequireComponent(typeof(BoxCollider2D))]
   public class BoxRaycastCollider2D : MonoBehaviour {
-    #region Public
-    [SerializeField] private LayerMask collisionMask;
-    [SerializeField] private float skinWidth = 0.015f;
-    [SerializeField] private float distanceBetweenRays = 0.25f;
-    [SerializeField] private int horizontalRayCount = 3;
-    [SerializeField] private int verticalRayCount = 3;
     [HideInInspector] public CollisionInfo Collisions { get {
       // Singleton
       if (_collisions == null) _collisions = new CollisionInfo(this);
       return _collisions;
     } }
-    #endregion
-
-    #region Internal
+    [HideInInspector] public LayerMask CollisionMask { get { return collisionMask; } }
+    
+    [SerializeField] private LayerMask collisionMask;
+    [SerializeField] private float skinWidth = 0.015f;
+    [SerializeField] private float distanceBetweenRays = 0.25f;
+    [SerializeField] private int horizontalRayCount = 3;
+    [SerializeField] private int verticalRayCount = 3;
+    
     private CollisionInfo _collisions;
     private BoxCollider2D boxCollider;
     private RaycastOrigins raycastOrigins;
     private float horizontalRaySpacing;
     private float verticalRaySpacing;
-    #endregion
-
+    
     private void Awake() {
       boxCollider = GetComponent<BoxCollider2D>();
     }
@@ -65,11 +63,15 @@ namespace DreamState {
     public void UpdateCollisions(Vector2 moveVector) {
       ClearCollisions();
       UpdateRaycastOrigins();
-      UpdateVerticalCollisions(moveVector);
-      UpdateHorizontalCollisions(moveVector);
+
+      Vector2 v = moveVector;
+      if (v.x != 0) v = UpdateHorizontalCollisions(v);
+      if (v.y != 0) UpdateVerticalCollisions(v);
+
+      PostUpdate();
     }
 
-    private void UpdateVerticalCollisions(Vector2 moveVector) {
+    private Vector2 UpdateVerticalCollisions(Vector2 moveVector) {
       float yDir = Mathf.Sign(moveVector.y);
       var rayLength = Mathf.Abs(moveVector.y) + skinWidth;
       for (int i = 0; i < verticalRayCount; i++) {
@@ -77,24 +79,27 @@ namespace DreamState {
         rayOrigin += Vector2.right * (verticalRaySpacing * i + moveVector.x);
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * yDir, rayLength, collisionMask);
 
-        Debug.DrawRay(rayOrigin, Vector2.up * yDir, Color.red);
-
         // Check if there was actually a collision
         if (!hit) continue;
 
-        // Add collision to the appropriate collider
-        if (yDir == -1) {
-          Collisions.Bottom.hits.Add(hit);
-        } else {
-          Collisions.Top.hits.Add(hit);
-        }
+        // Let collision affect other ray collision detection
+        moveVector.y = (hit.distance - skinWidth) * yDir;
 
         // Reduce ray length to avoid unnecessary collisions
         rayLength = hit.distance;
+
+        // Add collision to the appropriate collider
+        if (yDir == -1) {
+          Collisions.Bottom.AddHit(hit);
+        } else {
+          Collisions.Top.AddHit(hit);
+        }
       }
+
+      return moveVector;
     }
 
-    private void UpdateHorizontalCollisions(Vector2 moveVector) {
+    private Vector2 UpdateHorizontalCollisions(Vector2 moveVector) {
       float xDir = Mathf.Sign(moveVector.x);
       var rayLength = Mathf.Abs(moveVector.x) + skinWidth;
 
@@ -110,16 +115,21 @@ namespace DreamState {
         if (!hit) continue;
         if (hit.distance == 0) continue;
 
-        // Add collision to the appropriate collider
-        if (xDir == -1) {
-          Collisions.Left.hits.Add(hit);
-        } else {
-          Collisions.Right.hits.Add(hit);
-        }
+        // Let collision affect other ray collision detection
+        moveVector.x = (hit.distance - skinWidth) * xDir;
 
         // Reduce ray length to avoid unnecessary collisions
         rayLength = hit.distance;
+
+        // Add collision to the appropriate collider
+        if (xDir == -1) {
+          Collisions.Left.AddHit(hit);
+        } else {
+          Collisions.Right.AddHit(hit);
+        }
       }
+
+      return moveVector;
     }
 
     private void ClearCollisions() {
@@ -127,6 +137,13 @@ namespace DreamState {
       Collisions.Bottom.Clear();
       Collisions.Left.Clear();
       Collisions.Right.Clear();
+    }
+
+    private void PostUpdate() {
+      Collisions.Top.PostUpdate();
+      Collisions.Bottom.PostUpdate();
+      Collisions.Left.PostUpdate();
+      Collisions.Right.PostUpdate();
     }
 
     public struct RaycastOrigins {
@@ -151,17 +168,24 @@ namespace DreamState {
     }
 
     public class EdgeCollisionInfo {
-      public List<RaycastHit2D> hits;
+      private List<RaycastHit2D> hits;
       private BoxRaycastCollider2D collider;
+      private List<Action<bool>> callbacks;
+      private bool lastCollisionState;
       
       public EdgeCollisionInfo(BoxRaycastCollider2D c) {
         collider = c;
         hits = new List<RaycastHit2D>();
+        callbacks = new List<Action<bool>>();
+      }
+
+      public void AddHit(RaycastHit2D hit) {
+        hits.Add(hit);
       }
 
       public float NearestCollision() {
         if (hits.Count < 1) return 0.0f;
-        return (from h in hits select h.distance).Min() - collider.skinWidth;
+        return hits.Select(h => h.distance).Min() - collider.skinWidth;
       }
 
       public bool IsColliding() {
@@ -170,6 +194,21 @@ namespace DreamState {
 
       public void Clear() {
         hits.Clear();
+      }
+
+      public void PostUpdate() {
+        var colliding = IsColliding();
+
+        // If collision state changed on this update, notify subscribers
+        if (colliding != lastCollisionState) {
+          callbacks.ForEach(c => c(colliding));
+        }
+
+        lastCollisionState = colliding;
+      }
+
+      public void RegisterCallback(Action<bool> callback) {
+        callbacks.Add(callback);
       }
     }
   }

@@ -12,7 +12,7 @@ namespace DreamState {
   [RequireComponent(typeof(BoxRaycastCollider2D))]
   public class PhysicsObject2D : MonoBehaviour {
     public Vector2 CurrentVelocity { get { return currentVelocity; } }
-    public Vector2 LastTargetVelocity { get { return lastTargetVelocity; } }
+    public Vector2 TargetVelocity { get { return targetVelocity; } }
     public BoxRaycastCollider2D.CollisionInfo Collisions { get { return raycastCollider.Collisions; } }
     
     [SerializeField] private float gravityModifier = 1.0f;
@@ -22,7 +22,6 @@ namespace DreamState {
     private BoxRaycastCollider2D raycastCollider;
     private Vector2 currentVelocity;
     private Vector2 targetVelocity;
-    private Vector2 lastTargetVelocity;
     private List<PhysicsObject2DModifier> modifiers = new List<PhysicsObject2DModifier>();
     
     /// <summary>
@@ -113,7 +112,6 @@ namespace DreamState {
       // TODO: Handle moving platforms
 
       // Reset target velocity
-      lastTargetVelocity = targetVelocity;
       targetVelocity = Vector2.zero;
     }
 

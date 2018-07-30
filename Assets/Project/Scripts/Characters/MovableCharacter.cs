@@ -24,6 +24,7 @@ namespace DreamState {
     private float curDashTime;
     private bool holdingDash;
     private float curMoveSpeed;
+    private bool initDashFacingDir;
 
     public void HorizontalMove(float moveScalar) {
       var newMove = Vector2.right * curMoveSpeed * moveScalar;
@@ -35,7 +36,7 @@ namespace DreamState {
 
     public virtual void OnJumpPress() {
       if (physics.Grounded()) {
-        curMoveSpeed = Dashing() ? dashSpeed : runSpeed;
+        curMoveSpeed = (holdingDash && curDashTime < maxDashTime) ? dashSpeed : runSpeed;
         physics.SetVelocity(Vector2.up * jumpForce);
       } else if (wallStick.StickingToWall) {
         curMoveSpeed = holdingDash ? dashSpeed : runSpeed;
@@ -52,12 +53,14 @@ namespace DreamState {
       }
     }
 
-    public virtual void OnDashPress() { }
+    public virtual void OnDashPress() {
+      initDashFacingDir = spriteRenderer.flipX;
+    }
 
     public virtual void OnDashHold() {
       holdingDash = true;
       curDashTime += Time.deltaTime;
-      if (Dashing() && physics.Grounded()) {
+      if (initDashFacingDir == spriteRenderer.flipX && curDashTime < maxDashTime && physics.Grounded()) {
         animator.SetBool("Dashing", true);
         physics.Move((spriteRenderer.flipX ? Vector2.left : Vector2.right) * dashSpeed);
       } else {
@@ -69,10 +72,6 @@ namespace DreamState {
       holdingDash = false;
       curDashTime = 0.0f;
       animator.SetBool("Dashing", false);
-    }
-
-    protected bool Dashing() {
-      return holdingDash && curDashTime < maxDashTime;
     }
 
     private void OnGroundedChange(bool newGrounded) {
@@ -95,7 +94,7 @@ namespace DreamState {
 
     private void Update() {
       animator.SetBool("Grounded", physics.Grounded());
-      animator.SetFloat("xSpeed", Mathf.Abs(physics.CurrentVelocity.x));
+      animator.SetFloat("xSpeed", Mathf.Abs(physics.TargetVelocity.x));
       animator.SetFloat("ySpeed", physics.CurrentVelocity.y);
       animator.SetBool("StickingToWall", wallStick.StickingToWall);
 

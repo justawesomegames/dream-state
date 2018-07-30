@@ -1,8 +1,6 @@
 # Dream State
 
-Unity project for Dream State.
-
-## Shared Documentation
+## External
 
 [Design Doc](https://docs.google.com/document/d/1KRIfIZXIcgD6PZ0s587h0KvBtlP2AoZ4wNqnRCtIIKg)
 
@@ -11,6 +9,8 @@ Unity project for Dream State.
 [Levels and Maps](https://docs.google.com/document/d/1B0of8BLm5Y8hVjXYCi6-i6bdAcNPS6MguvqfVek96UA)
 
 [Enemies](https://docs.google.com/document/d/1RT78fIcyutQ_HCHgvbjdCsnQ8u4gnrkNDhd_AqHBz6w)
+
+[Trello Board](https://trello.com/b/K41esFHt/dream-state)
 
 ## Dev Setup (Mac)
 

@@ -21,8 +21,8 @@ namespace DreamState {
       }
 
       var gDir = target.GravityDirection();
-      stickingToWall = (target.LastTargetVelocity.x < 0.0f && target.Collisions.Left.IsColliding() ||
-                        target.LastTargetVelocity.x > 0.0f && target.Collisions.Right.IsColliding()) &&
+      stickingToWall = (target.TargetVelocity.x < 0.0f && target.Collisions.Left.IsColliding() ||
+                        target.TargetVelocity.x > 0.0f && target.Collisions.Right.IsColliding()) &&
                         !target.Grounded() &&
                         ((gDir == -1 && v.y <= 0.0f) || (gDir == 1 && v.y >= 0.0f));
 
@@ -48,7 +48,7 @@ namespace DreamState {
     public void JumpOffWall(bool dashing) {
       stickingToWall = false;
       var v = dashing ? dashWallJump : wallJump;
-      target.SetVelocity(-new Vector2(v.x * Mathf.Sign(target.LastTargetVelocity.x), v.y * target.GravityDirection()));
+      target.SetVelocity(-new Vector2(v.x * Mathf.Sign(target.TargetVelocity.x), v.y * target.GravityDirection()));
     }
   }
 }

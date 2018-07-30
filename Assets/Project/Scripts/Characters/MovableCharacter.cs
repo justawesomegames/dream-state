@@ -21,6 +21,7 @@ namespace DreamState {
     protected Animator animator;
     protected SpriteRenderer spriteRenderer;
 
+    private bool facingRight;
     private float curDashTime;
     private bool holdingDash;
     private float curMoveSpeed;
@@ -30,7 +31,7 @@ namespace DreamState {
       var newMove = Vector2.right * curMoveSpeed * moveScalar;
       if (newMove.x != 0.0f) {
         physics.Move(newMove);
-        spriteRenderer.flipX = newMove.x < 0.0f;
+        Flip(newMove.x > 0.0);
       }
     }
 
@@ -54,15 +55,15 @@ namespace DreamState {
     }
 
     public virtual void OnDashPress() {
-      initDashFacingDir = spriteRenderer.flipX;
+      initDashFacingDir = facingRight;
     }
 
     public virtual void OnDashHold() {
       holdingDash = true;
       curDashTime += Time.deltaTime;
-      if (initDashFacingDir == spriteRenderer.flipX && curDashTime < maxDashTime && physics.Grounded()) {
+      if (initDashFacingDir == facingRight && curDashTime < maxDashTime && physics.Grounded()) {
         animator.SetBool("Dashing", true);
-        physics.Move((spriteRenderer.flipX ? Vector2.left : Vector2.right) * dashSpeed);
+        physics.Move((facingRight ? Vector2.left : Vector2.right) * dashSpeed);
       } else {
         animator.SetBool("Dashing", false);
       }
@@ -90,6 +91,7 @@ namespace DreamState {
       physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
 
       curMoveSpeed = runSpeed;
+      facingRight = true;
     }
 
     private void Update() {
@@ -103,6 +105,15 @@ namespace DreamState {
       if (wallStick.StickingToWall) {
         curMoveSpeed = runSpeed;
       }
+    }
+
+    private void Flip(bool right) {
+      if (right != facingRight) {
+        var newScale = transform.localScale;
+        newScale.x = right ? 1 : -1;
+        transform.localScale = newScale;
+      }
+      facingRight = right;
     }
   }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DreamState {
   [DisallowMultipleComponent]
-  [RequireComponent(typeof(PhysicsObject2D))]
+  [RequireComponent(typeof(PlatformerPhysics2D))]
   [RequireComponent(typeof(Rigidbody2D))]
   [RequireComponent(typeof(Animator))]
   [RequireComponent(typeof(SpriteRenderer))]
@@ -16,7 +16,7 @@ namespace DreamState {
     [SerializeField] protected float jumpForce = 20f;
     [SerializeField] protected WallStick wallStick;
 
-    protected PhysicsObject2D physics;
+    protected PlatformerPhysics2D physics;
     protected Rigidbody2D rigidBody;
     protected Animator animator;
     protected SpriteRenderer spriteRenderer;
@@ -26,17 +26,22 @@ namespace DreamState {
     private bool holdingDash;
     private float curMoveSpeed;
     private bool initDashFacingDir;
+    private bool didDoubleJump;
 
     public void HorizontalMove(float moveScalar) {
       var newMove = Vector2.right * curMoveSpeed * moveScalar;
+      physics.Move(newMove);
       if (newMove.x != 0.0f) {
-        physics.Move(newMove);
         Flip(newMove.x > 0.0);
       }
     }
 
     public virtual void OnJumpPress() {
-      if (physics.Grounded()) {
+      var grounded = physics.Grounded();
+      if (grounded || !didDoubleJump) {
+        if (!grounded) {
+          didDoubleJump = true;
+        }
         curMoveSpeed = (holdingDash && curDashTime < maxDashTime) ? dashSpeed : runSpeed;
         physics.SetVelocity(Vector2.up * jumpForce);
       } else if (wallStick.StickingToWall) {
@@ -63,7 +68,7 @@ namespace DreamState {
       curDashTime += Time.deltaTime;
       if (initDashFacingDir == facingRight && curDashTime < maxDashTime && physics.Grounded()) {
         animator.SetBool("Dashing", true);
-        physics.Move((facingRight ? Vector2.left : Vector2.right) * dashSpeed);
+        physics.Move((facingRight ? Vector2.right : Vector2.left) * dashSpeed);
       } else {
         animator.SetBool("Dashing", false);
       }
@@ -77,12 +82,13 @@ namespace DreamState {
 
     private void OnGroundedChange(bool newGrounded) {
       if (newGrounded) {
+        didDoubleJump = false;
         curMoveSpeed = runSpeed;
       }
     }
 
     private void Awake() {
-      physics = GetComponent<PhysicsObject2D>();
+      physics = GetComponent<PlatformerPhysics2D>();
       rigidBody = GetComponent<Rigidbody2D>();
       animator = GetComponent<Animator>();
       spriteRenderer = GetComponent<SpriteRenderer>();
@@ -97,6 +103,7 @@ namespace DreamState {
     private void Update() {
       animator.SetBool("Grounded", physics.Grounded());
       animator.SetFloat("xSpeed", Mathf.Abs(physics.TargetVelocity.x));
+      Debug.Log(physics.TargetVelocity.x);
       animator.SetFloat("ySpeed", physics.CurrentVelocity.y);
       animator.SetBool("StickingToWall", wallStick.StickingToWall);
 

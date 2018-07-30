@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DreamState {
   [Serializable]
-  public class WallStick : PhysicsObject2DModifier {
+  public class WallStick : PlatformerPhysics2DModifier {
     public bool StickingToWall { get { return stickingToWall; } }
 
     [SerializeField] private float wallSlideSpeed = 7f;

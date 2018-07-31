@@ -150,7 +150,9 @@ MonoBehaviour:
   dashSpeed: 15
   maxDashTime: 0.4
   jumpForce: 20
+  canDoubleJump: 1
   doubleJumpForce: 15
+  jumpTolerance: 0.05
   wallStick:
     wallSlideSpeed: 7
     wallStickTimeBeforeSlide: 0.3

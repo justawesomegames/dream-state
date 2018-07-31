@@ -13,14 +13,6 @@ namespace DreamState {
 				public const string DASH = "Dash";
 			}
 
-			/// <summary>
-			/// Directions objects can face
-			/// </summary>
-			public enum FacingDirection {
-				LEFT,
-				RIGHT
-			}
-
 			public static class Collision {
 				public const string ONE_WAY_PLATFORM_TAG = "Through";
 			}

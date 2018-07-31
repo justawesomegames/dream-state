@@ -48,9 +48,9 @@ namespace DreamState {
     }
 
     public void JumpOffWall(bool dashing) {
-      SetWallstick(false);
       var v = dashing ? dashWallJump : wallJump;
       target.SetVelocity(-new Vector2(v.x * Mathf.Sign(target.TargetVelocity.x), v.y * target.GravityDirection()));
+      SetWallstick(false);
     }
 
     public void OnWallStickChange(Action<bool> a) {

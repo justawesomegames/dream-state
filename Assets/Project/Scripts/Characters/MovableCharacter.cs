@@ -9,11 +9,18 @@ namespace DreamState {
   [RequireComponent(typeof(Animator))]
   [RequireComponent(typeof(SpriteRenderer))]
   public abstract class MovableCharacter : MonoBehaviour {
+    [Header("Movement")]
     [SerializeField] protected float runSpeed = 10f;
     [SerializeField] protected float dashSpeed = 15f;
     [SerializeField] protected float maxDashTime = 0.4f;
+
+    [Header("Jumping")]
     [SerializeField] protected float jumpForce = 20f;
+    [SerializeField] protected bool canDoubleJump = false;
     [SerializeField] protected float doubleJumpForce = 10f;
+    [SerializeField] protected float jumpTolerance = 0.05f;
+
+    [Header("Wall Stick/Jumping")]
     [SerializeField] protected WallStick wallStick;
 
     protected PlatformerPhysics2D physics;
@@ -27,6 +34,8 @@ namespace DreamState {
     private float curMoveSpeed;
     private bool initDashFacingDir;
     private bool didDoubleJump;
+    private bool canStillJump;
+    private float curJumpToleranceTime;
 
     public void HorizontalMove(float moveScalar) {
       var newMove = Vector2.right * curMoveSpeed * moveScalar;
@@ -47,10 +56,10 @@ namespace DreamState {
       }
       
       // Handle jumping from ground
-      if (grounded) {
+      if (grounded || canStillJump) {
         curMoveSpeed = (holdingDash && curDashTime < maxDashTime) ? dashSpeed : runSpeed;
         physics.SetVelocity(Vector2.up * jumpForce);
-      } else if (!didDoubleJump) {
+      } else if (!didDoubleJump && canDoubleJump) {
         didDoubleJump = true;
         physics.SetVelocity(Vector2.up * doubleJumpForce);
       }
@@ -90,13 +99,19 @@ namespace DreamState {
       if (grounded) {
         didDoubleJump = false;
         curMoveSpeed = runSpeed;
+      } else {
+        canStillJump = true;
+        curJumpToleranceTime = 0.0f;
       }
     }
 
     private void OnWallStickChange(bool stickingToWall) {
       if (stickingToWall) {
-        curMoveSpeed = runSpeed;
         didDoubleJump = false;
+        curMoveSpeed = runSpeed;
+      } else {
+        canStillJump = true;
+        curJumpToleranceTime = 0.0f;
       }
     }
 
@@ -122,6 +137,14 @@ namespace DreamState {
       animator.SetBool("StickingToWall", wallStick.StickingToWall);
 
       spriteRenderer.flipY = physics.GravityDirection() == 1;
+
+      // Handle jump tolerance
+      if (canStillJump) {
+        curJumpToleranceTime += Time.deltaTime;
+        if (curJumpToleranceTime > jumpTolerance) {
+          canStillJump = false;
+        }
+      }
     }
 
     private void Flip(bool right) {

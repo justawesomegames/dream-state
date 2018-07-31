@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace DreamState {
   /// <summary>
-  /// PhysicsObject2D handles 2D physics separately from the Unity physics engine
-  /// by utilizing raycasts for collision detection. By default, the PhysicsObject2D
+  /// PlatformerPhysics2D handles 2D physics separately from the Unity physics engine
+  /// by utilizing raycasts for collision detection. By default, the PlatformerPhysics2D
   /// will handle gravity and translating the object with the given inputs.
   /// </summary>
   [RequireComponent(typeof(BoxRaycastCollider2D))]
-  public class PhysicsObject2D : MonoBehaviour {
+  public class PlatformerPhysics2D : MonoBehaviour {
     public Vector2 CurrentVelocity { get { return currentVelocity; } }
     public Vector2 TargetVelocity { get { return targetVelocity; } }
     public BoxRaycastCollider2D.CollisionInfo Collisions { get { return raycastCollider.Collisions; } }
@@ -22,7 +22,7 @@ namespace DreamState {
     private BoxRaycastCollider2D raycastCollider;
     private Vector2 currentVelocity;
     private Vector2 targetVelocity;
-    private List<PhysicsObject2DModifier> modifiers = new List<PhysicsObject2DModifier>();
+    private List<PlatformerPhysics2DModifier> modifiers = new List<PlatformerPhysics2DModifier>();
     
     /// <summary>
     /// Move object at a speed
@@ -64,7 +64,7 @@ namespace DreamState {
     /// </summary>
     /// <param name="m">Modifier to add</param>
     /// <returns>Guid of modifier</returns>
-    public string RegisterModifier(PhysicsObject2DModifier newModifier) {
+    public string RegisterModifier(PlatformerPhysics2DModifier newModifier) {
       if (modifiers.Exists(m => m.Guid == newModifier.Guid)) {
         Debug.LogWarning(String.Format("Modifier {0} is already registered!", newModifier.Guid));
         return String.Empty;
@@ -78,7 +78,7 @@ namespace DreamState {
     /// Remove a modifier from this physics object
     /// </summary>
     /// <param name="modifier">Modifier to remove</param>
-    public void RemoveModifier(PhysicsObject2DModifier modifier) {
+    public void RemoveModifier(PlatformerPhysics2DModifier modifier) {
       if (!modifiers.Exists(m => m.Guid == modifier.Guid)) {
         Debug.LogWarning(String.Format("Modifier {0} does not exist!", modifier.Guid));
         return;
@@ -110,9 +110,6 @@ namespace DreamState {
 
       // TODO: Handle slopes
       // TODO: Handle moving platforms
-
-      // Reset target velocity
-      targetVelocity = Vector2.zero;
     }
 
     /// <summary>

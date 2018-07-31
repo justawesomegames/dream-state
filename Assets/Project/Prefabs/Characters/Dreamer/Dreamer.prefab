@@ -23,10 +23,10 @@ GameObject:
   - component: {fileID: 50175537036692076}
   - component: {fileID: 212889501177615960}
   - component: {fileID: 95930526847204934}
-  - component: {fileID: 114129786370640692}
   - component: {fileID: 114645009632150360}
-  - component: {fileID: 114432909431342044}
+  - component: {fileID: 114129786370640692}
   - component: {fileID: 114619582732366908}
+  - component: {fileID: 114211210019406146}
   m_Layer: 9
   m_Name: Dreamer
   m_TagString: Untagged
@@ -118,13 +118,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1778227753367288}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c311244c58d90604fb84e2bc6ae20aad, type: 3}
+  m_Script: {fileID: 11500000, guid: 0bc7cbb20ee0e734f810bd1052bb4d99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gravityModifier: 1
   horizontalAcceleration: 3
   terminalVelocity: 20
---- !u!114 &114432909431342044
+--- !u!114 &114211210019406146
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -132,7 +132,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1778227753367288}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96ac495701f624b9281967984b761ffc, type: 3}
+  m_Script: {fileID: 11500000, guid: 787e09ef6b873d04b8816e0c34cd9671, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114619582732366908
@@ -150,6 +150,7 @@ MonoBehaviour:
   dashSpeed: 15
   maxDashTime: 0.4
   jumpForce: 20
+  doubleJumpForce: 15
   wallStick:
     wallSlideSpeed: 7
     wallStickTimeBeforeSlide: 0.3

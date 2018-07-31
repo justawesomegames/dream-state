@@ -3,10 +3,10 @@ using UnityEngine;
 
 namespace DreamState {
   /// <summary>
-  /// PhysicsObject2DModifier encapsulates any changes to velocity outside
-  /// of the standard PhysicsObject2D handling.
+  /// PlatformerPhysics2DModifier encapsulates any changes to velocity outside
+  /// of the standard PlatformerPhysics2D handling.
   /// </summary>
-  public abstract class PhysicsObject2DModifier {
+  public abstract class PlatformerPhysics2DModifier {
     public string Guid { get {
       if (guid == String.Empty) {
         if (IsUniqueModifier()) {
@@ -17,7 +17,7 @@ namespace DreamState {
       }
       return guid;
     } }
-    protected PhysicsObject2D target;
+    protected PlatformerPhysics2D target;
     private string guid;
 
     /// <summary>
@@ -37,7 +37,7 @@ namespace DreamState {
     /// Set the physics object that this modifier will act upon
     /// </summary>
     /// <param name="o"></param>
-    public void SetTarget(PhysicsObject2D o) {
+    public void SetTarget(PlatformerPhysics2D o) {
       target = o;
     }
   }

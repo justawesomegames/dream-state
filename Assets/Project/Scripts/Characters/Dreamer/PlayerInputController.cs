@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DreamState {
   [RequireComponent(typeof(Dreamer))]
-  public class PlayerController : MonoBehaviour {
+  public class PlayerInputController : MonoBehaviour {
     private Dreamer player;
 
     private void Awake() {

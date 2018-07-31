@@ -4,19 +4,19 @@ using UnityEngine;
 
 namespace DreamState {
   [DisallowMultipleComponent]
-  [RequireComponent(typeof(PhysicsObject2D))]
+  [RequireComponent(typeof(PlatformerPhysics2D))]
   [RequireComponent(typeof(Rigidbody2D))]
   [RequireComponent(typeof(Animator))]
   [RequireComponent(typeof(SpriteRenderer))]
   public abstract class MovableCharacter : MonoBehaviour {
-    [Header("Movement")]
     [SerializeField] protected float runSpeed = 10f;
     [SerializeField] protected float dashSpeed = 15f;
     [SerializeField] protected float maxDashTime = 0.4f;
     [SerializeField] protected float jumpForce = 20f;
+    [SerializeField] protected float doubleJumpForce = 10f;
     [SerializeField] protected WallStick wallStick;
 
-    protected PhysicsObject2D physics;
+    protected PlatformerPhysics2D physics;
     protected Rigidbody2D rigidBody;
     protected Animator animator;
     protected SpriteRenderer spriteRenderer;
@@ -26,22 +26,33 @@ namespace DreamState {
     private bool holdingDash;
     private float curMoveSpeed;
     private bool initDashFacingDir;
+    private bool didDoubleJump;
 
     public void HorizontalMove(float moveScalar) {
       var newMove = Vector2.right * curMoveSpeed * moveScalar;
+      physics.Move(newMove);
       if (newMove.x != 0.0f) {
-        physics.Move(newMove);
         Flip(newMove.x > 0.0);
       }
     }
 
     public virtual void OnJumpPress() {
-      if (physics.Grounded()) {
-        curMoveSpeed = (holdingDash && curDashTime < maxDashTime) ? dashSpeed : runSpeed;
-        physics.SetVelocity(Vector2.up * jumpForce);
-      } else if (wallStick.StickingToWall) {
+      var grounded = physics.Grounded();
+
+      // Handle wall jumping
+      if (wallStick.StickingToWall) {
         curMoveSpeed = holdingDash ? dashSpeed : runSpeed;
         wallStick.JumpOffWall(holdingDash);
+        return;
+      }
+      
+      // Handle jumping from ground
+      if (grounded) {
+        curMoveSpeed = (holdingDash && curDashTime < maxDashTime) ? dashSpeed : runSpeed;
+        physics.SetVelocity(Vector2.up * jumpForce);
+      } else if (!didDoubleJump) {
+        didDoubleJump = true;
+        physics.SetVelocity(Vector2.up * doubleJumpForce);
       }
     }
 
@@ -63,7 +74,7 @@ namespace DreamState {
       curDashTime += Time.deltaTime;
       if (initDashFacingDir == facingRight && curDashTime < maxDashTime && physics.Grounded()) {
         animator.SetBool("Dashing", true);
-        physics.Move((facingRight ? Vector2.left : Vector2.right) * dashSpeed);
+        physics.Move((facingRight ? Vector2.right : Vector2.left) * dashSpeed);
       } else {
         animator.SetBool("Dashing", false);
       }
@@ -75,20 +86,30 @@ namespace DreamState {
       animator.SetBool("Dashing", false);
     }
 
-    private void OnGroundedChange(bool newGrounded) {
-      if (newGrounded) {
+    private void OnGroundedChange(bool grounded) {
+      if (grounded) {
+        didDoubleJump = false;
         curMoveSpeed = runSpeed;
       }
     }
 
+    private void OnWallStickChange(bool stickingToWall) {
+      if (stickingToWall) {
+        curMoveSpeed = runSpeed;
+        didDoubleJump = false;
+      }
+    }
+
     private void Awake() {
-      physics = GetComponent<PhysicsObject2D>();
+      physics = GetComponent<PlatformerPhysics2D>();
       rigidBody = GetComponent<Rigidbody2D>();
       animator = GetComponent<Animator>();
       spriteRenderer = GetComponent<SpriteRenderer>();
 
       physics.RegisterModifier(wallStick);
       physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
+
+      wallStick.OnWallStickChange(OnWallStickChange);
 
       curMoveSpeed = runSpeed;
       facingRight = true;
@@ -101,10 +122,6 @@ namespace DreamState {
       animator.SetBool("StickingToWall", wallStick.StickingToWall);
 
       spriteRenderer.flipY = physics.GravityDirection() == 1;
-
-      if (wallStick.StickingToWall) {
-        curMoveSpeed = runSpeed;
-      }
     }
 
     private void Flip(bool right) {

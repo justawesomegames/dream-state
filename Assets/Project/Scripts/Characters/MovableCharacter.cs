@@ -9,11 +9,11 @@ namespace DreamState {
   [RequireComponent(typeof(Animator))]
   [RequireComponent(typeof(SpriteRenderer))]
   public abstract class MovableCharacter : MonoBehaviour {
-    [Header("Movement")]
     [SerializeField] protected float runSpeed = 10f;
     [SerializeField] protected float dashSpeed = 15f;
     [SerializeField] protected float maxDashTime = 0.4f;
     [SerializeField] protected float jumpForce = 20f;
+    [SerializeField] protected float doubleJumpForce = 10f;
     [SerializeField] protected WallStick wallStick;
 
     protected PlatformerPhysics2D physics;
@@ -38,15 +38,21 @@ namespace DreamState {
 
     public virtual void OnJumpPress() {
       var grounded = physics.Grounded();
-      if (grounded || !didDoubleJump) {
-        if (!grounded) {
-          didDoubleJump = true;
-        }
-        curMoveSpeed = (holdingDash && curDashTime < maxDashTime) ? dashSpeed : runSpeed;
-        physics.SetVelocity(Vector2.up * jumpForce);
-      } else if (wallStick.StickingToWall) {
+
+      // Handle wall jumping
+      if (wallStick.StickingToWall) {
         curMoveSpeed = holdingDash ? dashSpeed : runSpeed;
         wallStick.JumpOffWall(holdingDash);
+        return;
+      }
+      
+      // Handle jumping from ground
+      if (grounded) {
+        curMoveSpeed = (holdingDash && curDashTime < maxDashTime) ? dashSpeed : runSpeed;
+        physics.SetVelocity(Vector2.up * jumpForce);
+      } else if (!didDoubleJump) {
+        didDoubleJump = true;
+        physics.SetVelocity(Vector2.up * doubleJumpForce);
       }
     }
 
@@ -80,10 +86,17 @@ namespace DreamState {
       animator.SetBool("Dashing", false);
     }
 
-    private void OnGroundedChange(bool newGrounded) {
-      if (newGrounded) {
+    private void OnGroundedChange(bool grounded) {
+      if (grounded) {
         didDoubleJump = false;
         curMoveSpeed = runSpeed;
+      }
+    }
+
+    private void OnWallStickChange(bool stickingToWall) {
+      if (stickingToWall) {
+        curMoveSpeed = runSpeed;
+        didDoubleJump = false;
       }
     }
 
@@ -96,6 +109,8 @@ namespace DreamState {
       physics.RegisterModifier(wallStick);
       physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
 
+      wallStick.OnWallStickChange(OnWallStickChange);
+
       curMoveSpeed = runSpeed;
       facingRight = true;
     }
@@ -103,15 +118,10 @@ namespace DreamState {
     private void Update() {
       animator.SetBool("Grounded", physics.Grounded());
       animator.SetFloat("xSpeed", Mathf.Abs(physics.TargetVelocity.x));
-      Debug.Log(physics.TargetVelocity.x);
       animator.SetFloat("ySpeed", physics.CurrentVelocity.y);
       animator.SetBool("StickingToWall", wallStick.StickingToWall);
 
       spriteRenderer.flipY = physics.GravityDirection() == 1;
-
-      if (wallStick.StickingToWall) {
-        curMoveSpeed = runSpeed;
-      }
     }
 
     private void Flip(bool right) {

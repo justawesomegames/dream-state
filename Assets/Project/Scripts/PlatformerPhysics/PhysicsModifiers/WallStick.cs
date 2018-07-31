@@ -13,20 +13,22 @@ namespace DreamState {
     
     private bool stickingToWall = false;
     private float wallStickTime = 0.0f;
+    private Action<bool> onWallStickChange;
     
     public override Vector2 ModifyVelocity(Vector2 v) {
       if (v.x == 0.0f) {
-        stickingToWall = false;
+        SetWallstick(false);
         return v;
       }
 
       var gDir = target.GravityDirection();
-      stickingToWall = (target.TargetVelocity.x < 0.0f && target.Collisions.Left.IsColliding() ||
-                        target.TargetVelocity.x > 0.0f && target.Collisions.Right.IsColliding()) &&
-                        !target.Grounded() &&
-                        ((gDir == -1 && v.y <= 0.0f) || (gDir == 1 && v.y >= 0.0f));
+      var newWallStick = (target.TargetVelocity.x < 0.0f && target.Collisions.Left.IsColliding() ||
+                          target.TargetVelocity.x > 0.0f && target.Collisions.Right.IsColliding()) &&
+                          !target.Grounded() &&
+                          ((gDir == -1 && v.y <= 0.0f) || (gDir == 1 && v.y >= 0.0f));
 
-      if (!stickingToWall) {
+      SetWallstick(newWallStick);
+      if (!newWallStick) {
         wallStickTime = 0.0f;
         return v;
       }
@@ -46,9 +48,20 @@ namespace DreamState {
     }
 
     public void JumpOffWall(bool dashing) {
-      stickingToWall = false;
+      SetWallstick(false);
       var v = dashing ? dashWallJump : wallJump;
       target.SetVelocity(-new Vector2(v.x * Mathf.Sign(target.TargetVelocity.x), v.y * target.GravityDirection()));
+    }
+
+    public void OnWallStickChange(Action<bool> a) {
+      onWallStickChange = a;
+    }
+
+    private void SetWallstick(bool newWallStick) {
+      if (stickingToWall != newWallStick && onWallStickChange != null) {
+        onWallStickChange(newWallStick);
+      }
+      stickingToWall = newWallStick;
     }
   }
 }

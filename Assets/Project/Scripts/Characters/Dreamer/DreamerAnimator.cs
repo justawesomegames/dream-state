@@ -29,9 +29,9 @@ namespace DreamState {
       spriteRenderer.flipY = physics.GravityDirection() == 1;
 
 
-      if (physics.CurrentVelocity.x < 0.0f && facingRight) {
+      if (physics.TargetVelocity.x < 0.0f && facingRight) {
         Flip(false);
-      } else if (physics.CurrentVelocity.x > 0.0f && !facingRight) {
+      } else if (physics.TargetVelocity.x > 0.0f && !facingRight) {
         Flip(true);
       }
 

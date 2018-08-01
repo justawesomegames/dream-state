@@ -8,8 +8,6 @@ namespace DreamState {
 
     [SerializeField] private float wallSlideSpeed = 7f;
     [SerializeField] private float wallStickTimeBeforeSlide = 0.3f;
-    [SerializeField] private Vector2 wallJump = new Vector2(15f, 15f);
-    [SerializeField] private Vector2 dashWallJump = new Vector2(20f, 20f);
     
     private bool stickingToWall = false;
     private float wallStickTime = 0.0f;
@@ -45,12 +43,6 @@ namespace DreamState {
 
     public override bool IsUniqueModifier() {
       return true;
-    }
-
-    public void JumpOffWall(bool dashing) {
-      var v = dashing ? dashWallJump : wallJump;
-      target.SetVelocity(-new Vector2(v.x * Mathf.Sign(target.TargetVelocity.x), v.y * target.GravityDirection()));
-      SetWallstick(false);
     }
 
     public void OnWallStickChange(Action<bool> a) {

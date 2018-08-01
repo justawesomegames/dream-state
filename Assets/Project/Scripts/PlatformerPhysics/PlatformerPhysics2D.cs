@@ -23,6 +23,7 @@ namespace DreamState {
     private Vector2 currentVelocity;
     private Vector2 targetVelocity;
     private List<PlatformerPhysics2DModifier> modifiers = new List<PlatformerPhysics2DModifier>();
+    private bool instantVelocity;
     
     /// <summary>
     /// Move object at a speed
@@ -30,6 +31,35 @@ namespace DreamState {
     /// <param name="moveAmount">Speed to move object</param>
     public void Move(Vector2 moveAmount) {
       targetVelocity = moveAmount;
+    }
+
+    /// <summary>
+    /// Immediately change velocity
+    /// </summary>
+    /// <param name="velocity">Velocity to set to</param>
+    public void SetVelocity(Vector2 velocity) {
+      SetVelocityX(velocity.x);
+      SetVelocityY(velocity.y);
+    }
+
+    /// <summary>
+    /// Immediately change x-velocity
+    /// </summary>
+    /// <param name="newX">New x velocity</param>
+    public void SetVelocityX(float newX) {
+      currentVelocity.x = newX;
+    }
+
+    /// <summary>
+    /// Immediately change y-velocity
+    /// </summary>
+    /// <param name="newY">New y velocity</param>
+    public void SetVelocityY(float newY) {
+      currentVelocity.y = newY * -GravityDirection();
+    }
+
+    public void SetInstantVelocity(bool instant) {
+      instantVelocity = instant;
     }
 
     /// <summary>
@@ -46,17 +76,6 @@ namespace DreamState {
     /// <returns>-1.0 for downwards, 1.0 for upwards</returns>
     public float GravityDirection() {
       return Mathf.Sign(Physics2D.gravity.y * gravityModifier);
-    }
-
-    /// <summary>
-    /// Immediately set the current velocity
-    /// </summary>
-    /// <param name="velocity">Velocity to set to</param>
-    public void SetVelocity(Vector2 velocity) {
-      currentVelocity.y = velocity.y * (GravityDirection() * -1);
-      if (velocity.x != 0) {
-        currentVelocity.x = velocity.x;
-      }
     }
 
     /// <summary>
@@ -131,7 +150,9 @@ namespace DreamState {
       }
 
       // Horizontal velocity
-      if (currentVelocity.x < targetVelocity.x) {
+      if (instantVelocity) {
+        newVelocity.x = targetVelocity.x;
+      } else if (currentVelocity.x < targetVelocity.x) {
         newVelocity.x = Mathf.Min(newVelocity.x + horizontalAcceleration, targetVelocity.x);
       } else if (currentVelocity.x > targetVelocity.x) {
         newVelocity.x = Mathf.Max(newVelocity.x - horizontalAcceleration, targetVelocity.x);

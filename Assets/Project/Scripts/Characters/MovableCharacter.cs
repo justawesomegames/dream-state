@@ -17,11 +17,18 @@ namespace DreamState {
 
     [Header("Jumping")]
     [SerializeField] protected float jumpForce = 20f;
-    [SerializeField] protected bool canDoubleJump = false;
     [SerializeField] protected float doubleJumpForce = 10f;
-    [SerializeField] protected float jumpTolerance = 0.05f;
+    [SerializeField] private Vector2 wallJump = new Vector2(15f, 15f);
+    [SerializeField] private Vector2 dashWallJump = new Vector2(20f, 20f);
+    [SerializeField] protected bool canDoubleJump = false;
+    [SerializeField] protected float jumpTolerance = 0.2f;
+    [SerializeField] protected float dashWallJumpTolerance = 0.2f;
 
-    [Header("Wall Stick/Jumping")]
+    [Tooltip("Amount of time to apply acceleration after wall jump before re-enabling instant movement")]
+    [SerializeField]
+    protected float wallJumpFloatTime = 0.2f;
+
+    [Header("Wall Stick")]
     [SerializeField] protected WallStick wallStick;
 
     protected PlatformerPhysics2D physics;
@@ -32,10 +39,11 @@ namespace DreamState {
     private float curMoveSpeed;
     private bool initDashFacingDir;
     private bool didDoubleJump;
-    private bool canStillJump;
     private float curJumpToleranceTime;
+    private float curDashWallJumpTime;
+    private float curWallJumpFloatTime;
 
-    public void HorizontalMove(float moveScalar) {
+    public virtual void HorizontalMove(float moveScalar) {
       physics.Move(Vector2.right * curMoveSpeed * moveScalar);
     }
 
@@ -44,21 +52,21 @@ namespace DreamState {
 
       // Handle wall jumping
       if (wallStick.StickingToWall) {
-        curMoveSpeed = holdingDash ? dashSpeed : runSpeed;
-        wallStick.JumpOffWall(holdingDash);
+        JumpOffWall();
         return;
       }
       
       // Handle jumping from ground
-      if (grounded || canStillJump) {
+      if (grounded || curJumpToleranceTime < jumpTolerance) {
         curMoveSpeed = (holdingDash && curDashTime < maxDashTime) ? dashSpeed : runSpeed;
-        physics.SetVelocity(Vector2.up * jumpForce);
+        physics.SetVelocityY(jumpForce);
+        return;
       }
 
       // Handle double jumping
       if (canDoubleJump && !grounded && !didDoubleJump) {
         didDoubleJump = true;
-        physics.SetVelocity(Vector2.up * doubleJumpForce);
+        physics.SetVelocityY(doubleJumpForce);
       }
     }
 
@@ -67,12 +75,16 @@ namespace DreamState {
     public virtual void OnJumpRelease() {
       var gDir = physics.GravityDirection();
       if ((gDir == -1 && physics.CurrentVelocity.y > 0.0f || gDir == 1 && physics.CurrentVelocity.y < 0.0f)) {
-        physics.SetVelocity(Vector2.zero);  
+        physics.SetVelocityY(0);  
       }
+
+      // Prevent tolerant jump if already jumped
+      curJumpToleranceTime = jumpTolerance;
     }
 
     public virtual void OnDashPress() {
       initDashFacingDir = FacingRight();
+      curDashWallJumpTime = 0.0f;
     }
 
     public virtual void OnDashHold() {
@@ -81,7 +93,6 @@ namespace DreamState {
       var facingRight = FacingRight();
       if (initDashFacingDir == facingRight && curDashTime < maxDashTime && physics.Grounded()) {
         physics.Move((facingRight ? Vector2.right : Vector2.left) * dashSpeed);
-      } else {
       }
     }
 
@@ -94,8 +105,12 @@ namespace DreamState {
       if (grounded) {
         didDoubleJump = false;
         curMoveSpeed = runSpeed;
+
+        // Prevent dashing when just landing
+        if (holdingDash) {
+          curDashTime = maxDashTime;
+        }
       } else {
-        canStillJump = true;
         curJumpToleranceTime = 0.0f;
       }
     }
@@ -105,9 +120,22 @@ namespace DreamState {
         didDoubleJump = false;
         curMoveSpeed = runSpeed;
       } else {
-        canStillJump = true;
         curJumpToleranceTime = 0.0f;
       }
+    }
+
+    private void JumpOffWall() {
+      // Let physics calculate acceleration for a time
+      curWallJumpFloatTime = 0.0f;
+      physics.SetInstantVelocity(false);
+
+      // Set horizontal speed
+      var useDashSpeed = curDashWallJumpTime < dashWallJumpTolerance;
+      curMoveSpeed = useDashSpeed ? dashSpeed : runSpeed;
+
+      // Determine and set wall jump velocity
+      var v = useDashSpeed ? dashWallJump : wallJump;
+      physics.SetVelocity(-new Vector2(v.x * Mathf.Sign(physics.TargetVelocity.x), v.y * physics.GravityDirection()));
     }
 
     private void Awake() {
@@ -117,14 +145,20 @@ namespace DreamState {
       physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
       wallStick.OnWallStickChange(OnWallStickChange);
       curMoveSpeed = runSpeed;
+      physics.SetInstantVelocity(true);
     }
 
     private void Update() {
-      // Handle jump tolerance
-      if (canStillJump) {
+      if (curJumpToleranceTime < jumpTolerance) {
         curJumpToleranceTime += Time.deltaTime;
-        if (curJumpToleranceTime > jumpTolerance) {
-          canStillJump = false;
+      }
+      if (curDashWallJumpTime < dashWallJumpTolerance) {
+        curDashWallJumpTime += Time.deltaTime;
+      }
+      if (curWallJumpFloatTime < wallJumpFloatTime) {
+        curWallJumpFloatTime += Time.deltaTime;
+        if (curWallJumpFloatTime >= wallJumpFloatTime) {
+          physics.SetInstantVelocity(true);
         }
       }
     }

@@ -151,14 +151,16 @@ MonoBehaviour:
   dashSpeed: 15
   maxDashTime: 0.4
   jumpForce: 20
-  canDoubleJump: 1
   doubleJumpForce: 15
-  jumpTolerance: 0.05
+  wallJump: {x: 20, y: 15}
+  dashWallJump: {x: 20, y: 20}
+  canDoubleJump: 0
+  jumpTolerance: 0.2
+  dashWallJumpTolerance: 0.2
+  wallJumpFloatTime: 0.2
   wallStick:
     wallSlideSpeed: 7
     wallStickTimeBeforeSlide: 0.3
-    wallJump: {x: 15, y: 15}
-    dashWallJump: {x: 20, y: 20}
 --- !u!114 &114645009632150360
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -175,8 +177,8 @@ MonoBehaviour:
     m_Bits: 256
   skinWidth: 0.015
   distanceBetweenRays: 0.25
-  horizontalRayCount: 3
-  verticalRayCount: 3
+  horizontalRayCount: 7
+  verticalRayCount: 5
 --- !u!114 &114855791484935076
 MonoBehaviour:
   m_ObjectHideFlags: 1

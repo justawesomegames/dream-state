@@ -33,6 +33,7 @@ namespace DreamState {
 
     protected PlatformerPhysics2D physics;
     protected Rigidbody2D rigidBody;
+    protected SpriteRenderer spriteRenderer;
 
     private float curDashTime;
     private bool holdingDash;
@@ -141,6 +142,8 @@ namespace DreamState {
     private void Awake() {
       physics = GetComponent<PlatformerPhysics2D>();
       rigidBody = GetComponent<Rigidbody2D>();
+      spriteRenderer = GetComponent<SpriteRenderer>();
+
       physics.RegisterModifier(wallStick);
       physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
       wallStick.OnWallStickChange(OnWallStickChange);
@@ -164,7 +167,7 @@ namespace DreamState {
     }
 
     private bool FacingRight() {
-      return transform.localScale.x == 1;
+      return !spriteRenderer.flipX;
     }
   }
 }

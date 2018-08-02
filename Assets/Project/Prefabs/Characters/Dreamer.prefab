@@ -148,15 +148,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   runSpeed: 10
-  dashSpeed: 15
-  maxDashTime: 0.4
+  dash:
+    dashVelocity: {x: 20, y: 0}
+    dashTime: 0.3
+    dashTimeout: 0.2
   jumpForce: 20
   doubleJumpForce: 15
   wallJump: {x: 20, y: 15}
-  dashWallJump: {x: 20, y: 20}
-  canDoubleJump: 0
+  canDoubleJump: 1
   jumpTolerance: 0.1
-  dashWallJumpTolerance: 0.2
   wallJumpFloatTime: 0.2
   wallStick:
     wallSlideSpeed: 7
@@ -177,8 +177,8 @@ MonoBehaviour:
     m_Bits: 256
   skinWidth: 0.015
   distanceBetweenRays: 0.25
-  horizontalRayCount: 7
-  verticalRayCount: 5
+  horizontalRayCount: 2
+  verticalRayCount: 2
 --- !u!114 &114855791484935076
 MonoBehaviour:
   m_ObjectHideFlags: 1

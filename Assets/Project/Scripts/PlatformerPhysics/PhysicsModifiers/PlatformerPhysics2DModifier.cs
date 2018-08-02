@@ -8,7 +8,7 @@ namespace DreamState {
   /// </summary>
   public abstract class PlatformerPhysics2DModifier {
     public string Guid { get {
-      if (guid == String.Empty) {
+      if (String.IsNullOrEmpty(guid)) {
         if (IsUniqueModifier()) {
           guid = GetType().Name;
         } else {
@@ -21,7 +21,8 @@ namespace DreamState {
     private string guid;
 
     /// <summary>
-    /// Modify velocity after physics has applied gravity and acceleration
+    /// Called once per frame.
+    /// Modify velocity after physics has applied gravity and acceleration.
     /// </summary>
     /// <param name="v">Velocity after gravity and acceleration have been applied</param>
     /// <returns>New velocity</returns>

@@ -28,20 +28,16 @@ namespace DreamState {
 
       spriteRenderer.flipY = physics.GravityDirection() == 1;
 
-
       if (physics.TargetVelocity.x < 0.0f && facingRight) {
         Flip(false);
       } else if (physics.TargetVelocity.x > 0.0f && !facingRight) {
         Flip(true);
       }
-
     }
 
     private void Flip(bool right) {
       if (right != facingRight) {
-        var newScale = transform.localScale;
-        newScale.x = right ? 1 : -1;
-        transform.localScale = newScale;
+        spriteRenderer.flipX = !right;
       }
       facingRight = right;
     }

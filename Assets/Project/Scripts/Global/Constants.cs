@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-namespace DreamState {
+﻿namespace DreamState {
 	namespace Global {
 		public static class Constants {
 			/// <summary>

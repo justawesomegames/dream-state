@@ -1,5 +1,3 @@
-using DreamState.Global;
-using System;
 using UnityEngine;
 
 namespace DreamState {
@@ -76,7 +74,7 @@ namespace DreamState {
     }
 
     public virtual void OnDashPress() {
-      if (didDashInAir) {
+      if (didDashInAir || wallStick.StickingToWall) {
         return;
       }
       dash.SetDashing(true, FacingRight());

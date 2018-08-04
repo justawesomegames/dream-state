@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace DreamState {
   using System.Collections.Generic;
-  using Global;
 
   [RequireComponent(typeof(BoxCollider2D))]
   public class BoxRaycastCollider2D : MonoBehaviour {

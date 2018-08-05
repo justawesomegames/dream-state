@@ -1,10 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace DreamState {
-  using System.Collections.Generic;
-
+  [DisallowMultipleComponent]
   [RequireComponent(typeof(BoxCollider2D))]
   public class BoxRaycastCollider2D : MonoBehaviour {
     [HideInInspector] public CollisionInfo Collisions { get {
@@ -56,18 +56,20 @@ namespace DreamState {
     }
 
     /// <summary>
-    /// Calculate collisions based on a potential movement
+    /// Calculate a new velocity and update collisions
     /// </summary>
-    /// <param name="moveAmount">Amount to move</param>
-    public void UpdateCollisions(Vector2 moveVector) {
+    /// <param name="moveVector">Intended new velocity</param>
+    /// <returns>Velocity adjusted for collisions</returns>
+    public Vector2 HandleNewVelocity(Vector2 moveVector) {
       ClearCollisions();
       UpdateRaycastOrigins();
 
-      Vector2 v = moveVector;
-      if (v.x != 0) v = UpdateHorizontalCollisions(v);
-      if (v.y != 0) UpdateVerticalCollisions(v);
+      if (moveVector.x != 0) moveVector = UpdateHorizontalCollisions(moveVector);
+      if (moveVector.y != 0) moveVector = UpdateVerticalCollisions(moveVector);
 
       PostUpdate();
+
+      return moveVector;
     }
 
     private Vector2 UpdateVerticalCollisions(Vector2 moveVector) {

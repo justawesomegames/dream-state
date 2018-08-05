@@ -831,7 +831,7 @@ Prefab:
     - target: {fileID: 114778446581071986, guid: 01f44defc669ec941ae97e819ce3dd42,
         type: 2}
       propertyPath: speed
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 01f44defc669ec941ae97e819ce3dd42, type: 2}
@@ -896,11 +896,11 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4561972165493298, guid: 47c864d037cb14a91b912e7c3f68187c, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -2.26
+      value: 3.64
       objectReference: {fileID: 0}
     - target: {fileID: 4561972165493298, guid: 47c864d037cb14a91b912e7c3f68187c, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 11.14
+      value: 19.17
       objectReference: {fileID: 0}
     - target: {fileID: 4561972165493298, guid: 47c864d037cb14a91b912e7c3f68187c, type: 2}
       propertyPath: m_LocalPosition.z
@@ -925,6 +925,11 @@ Prefab:
     - target: {fileID: 4561972165493298, guid: 47c864d037cb14a91b912e7c3f68187c, type: 2}
       propertyPath: m_RootOrder
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114129786370640692, guid: 47c864d037cb14a91b912e7c3f68187c,
+        type: 2}
+      propertyPath: terminalVelocity
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 47c864d037cb14a91b912e7c3f68187c, type: 2}

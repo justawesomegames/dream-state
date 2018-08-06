@@ -16,8 +16,6 @@ namespace DreamState {
     public Vector2 TargetVelocity { get { return targetVelocity; } }
     public BoxRaycastCollider2D.CollisionInfo Collisions { get { return raycastCollider.Collisions; } }
 
-    public bool InstantVelocity { get; set; }
-
     [SerializeField] private float gravityModifier = 1.0f;
     [SerializeField] private float horizontalAcceleration = 2f;
     [SerializeField] private float terminalVelocity = 20f;
@@ -32,8 +30,24 @@ namespace DreamState {
     /// Move object at a speed
     /// </summary>
     /// <param name="moveAmount">Speed to move object</param>
-    public void Move(Vector2 moveAmount) {
+    /// <param name="instantX">Instantly set current x-velocity?</param>
+    /// <param name="instantY">Instantly set current y-velocity?</param>
+    public void Move(Vector2 moveAmount, bool instantX = false, bool instantY = false) {
       targetVelocity = moveAmount;
+      if (instantX) {
+        currentVelocity.x = moveAmount.x;
+      }
+      if (instantY) {
+        currentVelocity.y = moveAmount.y;
+      }
+    }
+
+    /// <summary>
+    /// Immediately move the object
+    /// </summary>
+    /// <param name="moveAmount">Amount to move</param>
+    public void MoveNow(Vector2 moveAmount) {
+      HandleNewMovement(moveAmount);
     }
 
     /// <summary>
@@ -116,13 +130,15 @@ namespace DreamState {
 
     private void Update() {
       currentVelocity = CalculateNewVelocity();
-      var normalized = currentVelocity * Time.deltaTime;
-      normalized = raycastCollider.HandleNewVelocity(normalized);
-      normalized = HandleMovableObjects(normalized);
-      transform.Translate(normalized);
-      currentVelocity = ZeroOutVelocity(currentVelocity);
+      HandleNewMovement(currentVelocity * Time.deltaTime);
+    }
 
-      // TODO: Handle slopes
+    private void HandleNewMovement(Vector2 newMove) {
+      var velocityAfterCollisions = raycastCollider.HandleNewVelocity(newMove);
+      transform.Translate(velocityAfterCollisions);
+
+      if (raycastCollider.Collisions.Top.IsColliding() || raycastCollider.Collisions.Bottom.IsColliding()) currentVelocity.y = 0;
+      if (raycastCollider.Collisions.Left.IsColliding() || raycastCollider.Collisions.Right.IsColliding()) currentVelocity.x = 0;
     }
 
     /// <summary>
@@ -144,9 +160,7 @@ namespace DreamState {
       }
 
       // Horizontal velocity
-      if (InstantVelocity) {
-        newVelocity.x = targetVelocity.x;
-      } else if (currentVelocity.x < targetVelocity.x) {
+      if (currentVelocity.x < targetVelocity.x) {
         newVelocity.x = Mathf.Min(newVelocity.x + horizontalAcceleration, targetVelocity.x);
       } else if (currentVelocity.x > targetVelocity.x) {
         newVelocity.x = Mathf.Max(newVelocity.x - horizontalAcceleration, targetVelocity.x);
@@ -162,23 +176,12 @@ namespace DreamState {
 
     private Vector2 HandleMovableObjects(Vector2 velocity) {
       if (movables.Count > 0) {
-        var velocities = movables.Values.Select(m => m.CurrentVelocity());
+        var velocities = movables.Values.Select(m => m.Velocity);
         if (Grounded()) {
           velocity.x += velocities.Select(v => v.x).Max();
           velocity.y = velocities.Select(v => v.y).Max();
         }
       }
-      return velocity;
-    }
-
-    /// <summary>
-    /// Check each edge of the collider and set velocity to 0 if colliding
-    /// </summary>
-    /// <param name="velocity">Velocity to zero out</param>
-    /// <returns>New velocity potentially zeroed out</returns>
-    private Vector2 ZeroOutVelocity(Vector2 velocity) {
-      if (raycastCollider.Collisions.Top.IsColliding() || raycastCollider.Collisions.Bottom.IsColliding()) velocity.y = 0;
-      if (raycastCollider.Collisions.Left.IsColliding() || raycastCollider.Collisions.Right.IsColliding()) velocity.x = 0;
       return velocity;
     }
 

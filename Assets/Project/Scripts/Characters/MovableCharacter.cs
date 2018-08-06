@@ -36,18 +36,18 @@ namespace DreamState {
     private bool didDashInAir = false;
 
     public virtual void HorizontalMove(float moveScalar) {
-      physics.Move(Vector2.right * runSpeed * moveScalar);
+      physics.Move(Vector2.right * runSpeed * moveScalar, curWallJumpFloatTime >= wallJumpFloatTime);
     }
 
     public virtual void OnJumpPress() {
-      var grounded = physics.Grounded();
-
       // Handle wall jumping
       if (wallStick.StickingToWall) {
         JumpOffWall();
         return;
       }
-      
+
+      var grounded = physics.Grounded();
+
       // Handle jumping from ground
       if (grounded || curJumpToleranceTime < jumpTolerance) {
         physics.SetVelocityY(jumpForce);
@@ -109,7 +109,6 @@ namespace DreamState {
     private void JumpOffWall() {
       // Let physics calculate acceleration for a time
       curWallJumpFloatTime = 0.0f;
-      physics.InstantVelocity = false;
 
       physics.SetVelocity(-new Vector2(wallJump.x * Mathf.Sign(physics.TargetVelocity.x), wallJump.y * physics.GravityDirection()));
     }
@@ -122,9 +121,10 @@ namespace DreamState {
       physics.RegisterModifier(wallStick);
       physics.RegisterModifier(dash);
       physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
-      physics.InstantVelocity = true;
 
       wallStick.OnWallStickChange(OnWallStickChange);
+
+      curWallJumpFloatTime = wallJumpFloatTime;
     }
 
     private void Update() {
@@ -133,9 +133,6 @@ namespace DreamState {
       }
       if (curWallJumpFloatTime < wallJumpFloatTime) {
         curWallJumpFloatTime += Time.deltaTime;
-        if (curWallJumpFloatTime >= wallJumpFloatTime) {
-          physics.InstantVelocity = true;
-        }
       }
     }
 

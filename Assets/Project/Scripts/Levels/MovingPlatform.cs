@@ -5,8 +5,8 @@ using UnityEditor;
 namespace DreamState {
   [DisallowMultipleComponent]
   public class MovingPlatform : MovableObject2D {
-    [SerializeField] private Vector3[] waypoints;
-    [SerializeField] private float speed;
+    [SerializeField] private Vector3[] waypoints = new Vector3[1];
+    [SerializeField] private float speed = 5f;
     [SerializeField] private bool cyclic;
     [SerializeField] private float waitTime;
     [SerializeField] [Range(0, 2)] private float easeAmount;
@@ -15,11 +15,6 @@ namespace DreamState {
     private int fromWaypointIndex;
     private float percentBetweenWaypoints;
     private float nextMoveTime;
-    private Vector3 velocity;
-
-    public override Vector3 CurrentVelocity() {
-      return velocity;
-    }
 
     private void Start() {
       globalWaypoints = new Vector3[waypoints.Length];
@@ -28,18 +23,12 @@ namespace DreamState {
       }
     }
 
-    private void Update() {
-      velocity = CalculatePlatformMovement();
-      transform.Translate(velocity);
-    }
-
     private float Ease(float x) {
       var a = easeAmount + 1;
       return Mathf.Pow(x, a) / (Mathf.Pow(x, a) + Mathf.Pow(1 - x, a));
     }
 
-    private Vector3 CalculatePlatformMovement() {
-
+    protected override Vector3 CalculateNewVelocity() {
       if (Time.time < nextMoveTime) {
         return Vector3.zero;
       }

@@ -8,7 +8,6 @@ namespace DreamState {
   [RequireComponent(typeof(BoxCollider2D))]
   public class BoxRaycastCollider2D : MonoBehaviour {
     [HideInInspector] public CollisionInfo Collisions { get {
-      // Singleton
       if (_collisions == null) _collisions = new CollisionInfo(this);
       return _collisions;
     } }
@@ -64,29 +63,11 @@ namespace DreamState {
       ClearCollisions();
       UpdateRaycastOrigins();
 
-      // When specifically moving on the x or y axis, only check move direction for collisions
-      // When not moving, make sure to check both directions
-
-      if (moveVector.x > 0) {
-        moveVector = UpdateHorizontalCollisions(moveVector, true);
+      if (moveVector.x != 0) {
+        moveVector = UpdateHorizontalCollisions(moveVector, moveVector.x > 0);
       }
-      else if (moveVector.x < 0) {
-        moveVector = UpdateHorizontalCollisions(moveVector, false);
-      }
-      else {
-        moveVector = UpdateHorizontalCollisions(moveVector, true);
-        moveVector = UpdateHorizontalCollisions(moveVector, false);
-      }
-
-      if (moveVector.y > 0) {
-        moveVector = UpdateVerticalCollisions(moveVector, true);
-      }
-      else if (moveVector.y < 0) {
-        moveVector = UpdateVerticalCollisions(moveVector, false);
-      }
-      else {
-        moveVector = UpdateVerticalCollisions(moveVector, true);
-        moveVector = UpdateVerticalCollisions(moveVector, false);
+      if (moveVector.y != 0) {
+        moveVector = UpdateVerticalCollisions(moveVector, moveVector.y > 0);
       }
 
       PostUpdate();
@@ -219,6 +200,10 @@ namespace DreamState {
 
       public bool IsColliding() {
         return hits.Count > 0;
+      }
+
+      public IEnumerable<GameObject> CollisionObjects() {
+        return hits.Select(h => h.transform.gameObject).ToList().Distinct();
       }
 
       public IEnumerable<int> CollidingObjectIds() {

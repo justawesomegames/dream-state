@@ -24,7 +24,6 @@ namespace DreamState {
     private Vector2 currentVelocity;
     private Vector2 targetVelocity;
     private Dictionary<string, PlatformerPhysics2DModifier> modifiers = new Dictionary<string, PlatformerPhysics2DModifier>();
-    private Dictionary<int, MovableObject2D> movables = new Dictionary<int, MovableObject2D>();
 
     /// <summary>
     /// Move object at a speed
@@ -128,13 +127,14 @@ namespace DreamState {
       }
     }
 
-    private void Update() {
+    private void LateUpdate() {
       currentVelocity = CalculateNewVelocity();
       HandleNewMovement(currentVelocity * Time.deltaTime);
     }
 
     private void HandleNewMovement(Vector2 newMove) {
       var velocityAfterCollisions = raycastCollider.HandleNewVelocity(newMove);
+      
       transform.Translate(velocityAfterCollisions);
 
       if (raycastCollider.Collisions.Top.IsColliding() || raycastCollider.Collisions.Bottom.IsColliding()) currentVelocity.y = 0;
@@ -174,28 +174,17 @@ namespace DreamState {
       return newVelocity;
     }
 
-    private Vector2 HandleMovableObjects(Vector2 velocity) {
-      if (movables.Count > 0) {
-        var velocities = movables.Values.Select(m => m.Velocity);
-        if (Grounded()) {
-          velocity.x += velocities.Select(v => v.x).Max();
-          velocity.y = velocities.Select(v => v.y).Max();
-        }
-      }
-      return velocity;
-    }
-
     private void OnCollisionEnter2D(Collision2D collision) {
-      var movable = collision.gameObject.GetComponent<MovableObject2D>();
+      var movable = collision.gameObject.GetComponent<MovingObject2D>();
       if (movable != null) {
-        movables.Add(movable.GetInstanceID(), movable);
+        transform.parent = collision.gameObject.transform.parent;
       }
     }
 
     private void OnCollisionExit2D(Collision2D collision) {
-      var movable = collision.gameObject.GetComponent<MovableObject2D>();
+      var movable = collision.gameObject.GetComponent<MovingObject2D>();
       if (movable != null) {
-        movables.Remove(movable.GetInstanceID());
+        transform.parent = null;
       }
     }
   }

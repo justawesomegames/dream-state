@@ -175,7 +175,7 @@ MonoBehaviour:
   collisionMask:
     serializedVersion: 2
     m_Bits: 256
-  skinWidth: 0.015
+  skinWidth: 0.1
   distanceBetweenRays: 0.25
   horizontalRayCount: 2
   verticalRayCount: 2

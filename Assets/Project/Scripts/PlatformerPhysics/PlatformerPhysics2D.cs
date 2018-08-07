@@ -173,19 +173,5 @@ namespace DreamState {
 
       return newVelocity;
     }
-
-    private void OnCollisionEnter2D(Collision2D collision) {
-      var movable = collision.gameObject.GetComponent<MovingObject2D>();
-      if (movable != null) {
-        transform.parent = collision.gameObject.transform.parent;
-      }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision) {
-      var movable = collision.gameObject.GetComponent<MovingObject2D>();
-      if (movable != null) {
-        transform.parent = null;
-      }
-    }
   }
 }

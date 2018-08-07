@@ -9,12 +9,13 @@ namespace DreamState {
   /// by utilizing raycasts for collision detection. By default, the PlatformerPhysics2D
   /// will handle gravity and translating the object with the given inputs.
   /// </summary>
+  [DisallowMultipleComponent]
   [RequireComponent(typeof(BoxRaycastCollider2D))]
   public class PlatformerPhysics2D : MonoBehaviour {
     public Vector2 CurrentVelocity { get { return currentVelocity; } }
     public Vector2 TargetVelocity { get { return targetVelocity; } }
     public BoxRaycastCollider2D.CollisionInfo Collisions { get { return raycastCollider.Collisions; } }
-    
+
     [SerializeField] private float gravityModifier = 1.0f;
     [SerializeField] private float horizontalAcceleration = 2f;
     [SerializeField] private float terminalVelocity = 20f;
@@ -22,15 +23,30 @@ namespace DreamState {
     private BoxRaycastCollider2D raycastCollider;
     private Vector2 currentVelocity;
     private Vector2 targetVelocity;
-    private List<PlatformerPhysics2DModifier> modifiers = new List<PlatformerPhysics2DModifier>();
-    private bool instantVelocity;
-    
+    private Dictionary<string, PlatformerPhysics2DModifier> modifiers = new Dictionary<string, PlatformerPhysics2DModifier>();
+
     /// <summary>
     /// Move object at a speed
     /// </summary>
     /// <param name="moveAmount">Speed to move object</param>
-    public void Move(Vector2 moveAmount) {
+    /// <param name="instantX">Instantly set current x-velocity?</param>
+    /// <param name="instantY">Instantly set current y-velocity?</param>
+    public void Move(Vector2 moveAmount, bool instantX = false, bool instantY = false) {
       targetVelocity = moveAmount;
+      if (instantX) {
+        currentVelocity.x = moveAmount.x;
+      }
+      if (instantY) {
+        currentVelocity.y = moveAmount.y;
+      }
+    }
+
+    /// <summary>
+    /// Immediately move the object
+    /// </summary>
+    /// <param name="moveAmount">Amount to move</param>
+    public void MoveNow(Vector2 moveAmount) {
+      HandleNewMovement(moveAmount);
     }
 
     /// <summary>
@@ -58,10 +74,6 @@ namespace DreamState {
       currentVelocity.y = newY * -GravityDirection();
     }
 
-    public void SetInstantVelocity(bool instant) {
-      instantVelocity = instant;
-    }
-
     /// <summary>
     /// Based on current gravity direction, check top or bottom collider for collision
     /// </summary>
@@ -84,12 +96,12 @@ namespace DreamState {
     /// <param name="m">Modifier to add</param>
     /// <returns>Guid of modifier</returns>
     public string RegisterModifier(PlatformerPhysics2DModifier newModifier) {
-      if (modifiers.Exists(m => m.Guid == newModifier.Guid)) {
+      if (modifiers.ContainsKey(newModifier.Guid)) {
         Debug.LogWarning(String.Format("Modifier {0} is already registered!", newModifier.Guid));
         return String.Empty;
       }
       newModifier.SetTarget(this);
-      modifiers.Add(newModifier);
+      modifiers.Add(newModifier.Guid, newModifier);
       return newModifier.Guid;
     }
 
@@ -98,12 +110,12 @@ namespace DreamState {
     /// </summary>
     /// <param name="modifier">Modifier to remove</param>
     public void RemoveModifier(PlatformerPhysics2DModifier modifier) {
-      if (!modifiers.Exists(m => m.Guid == modifier.Guid)) {
+      if (!modifiers.ContainsKey(modifier.Guid)) {
         Debug.LogWarning(String.Format("Modifier {0} does not exist!", modifier.Guid));
         return;
       }
       modifier.SetTarget(null);
-      modifiers.Remove(modifier);
+      modifiers.Remove(modifier.Guid);
     }
 
     private void Awake() {
@@ -115,20 +127,18 @@ namespace DreamState {
       }
     }
 
-    private void Update() {
+    private void LateUpdate() {
       currentVelocity = CalculateNewVelocity();
+      HandleNewMovement(currentVelocity * Time.deltaTime);
+    }
 
-      // Account for any modifiers
-      modifiers.ForEach(m => currentVelocity = m.ModifyVelocity(currentVelocity));
+    private void HandleNewMovement(Vector2 newMove) {
+      var velocityAfterCollisions = raycastCollider.HandleNewVelocity(newMove);
+      
+      transform.Translate(velocityAfterCollisions);
 
-      var normalized = currentVelocity * Time.deltaTime;
-      raycastCollider.UpdateCollisions(normalized);
-      normalized = AdjustedVelocity(normalized);
-      transform.Translate(normalized);
-      currentVelocity = ZeroOutCollisions(currentVelocity);
-
-      // TODO: Handle slopes
-      // TODO: Handle moving platforms
+      if (raycastCollider.Collisions.Top.IsColliding() || raycastCollider.Collisions.Bottom.IsColliding()) currentVelocity.y = 0;
+      if (raycastCollider.Collisions.Left.IsColliding() || raycastCollider.Collisions.Right.IsColliding()) currentVelocity.x = 0;
     }
 
     /// <summary>
@@ -150,39 +160,32 @@ namespace DreamState {
       }
 
       // Horizontal velocity
-      if (instantVelocity) {
-        newVelocity.x = targetVelocity.x;
-      } else if (currentVelocity.x < targetVelocity.x) {
+      if (currentVelocity.x < targetVelocity.x) {
         newVelocity.x = Mathf.Min(newVelocity.x + horizontalAcceleration, targetVelocity.x);
       } else if (currentVelocity.x > targetVelocity.x) {
         newVelocity.x = Mathf.Max(newVelocity.x - horizontalAcceleration, targetVelocity.x);
       }
 
+      // Account for any modifiers
+      foreach(var kvp in modifiers) {
+        newVelocity = kvp.Value.ModifyVelocity(newVelocity);
+      }
+
       return newVelocity;
     }
 
-    /// <summary>
-    /// Check each edge of the collider and adjust velocity accordingly
-    /// </summary>
-    /// <param name="velocity">Intended velocity to move</param>
-    /// <returns>New velocity accounting for collisions</returns>
-    private Vector2 AdjustedVelocity(Vector2 velocity) {
-      if (raycastCollider.Collisions.Top.IsColliding()) velocity.y = raycastCollider.Collisions.Top.NearestCollision();
-      if (raycastCollider.Collisions.Bottom.IsColliding()) velocity.y = -raycastCollider.Collisions.Bottom.NearestCollision();
-      if (raycastCollider.Collisions.Right.IsColliding()) velocity.x = raycastCollider.Collisions.Right.NearestCollision();
-      if (raycastCollider.Collisions.Left.IsColliding()) velocity.x = -raycastCollider.Collisions.Left.NearestCollision();
-      return velocity;
+    private void OnCollisionEnter2D(Collision2D collision) {
+      var movable = collision.gameObject.GetComponent<MovingObject2D>();
+      if (movable != null) {
+        transform.parent = collision.gameObject.transform.parent;
+      }
     }
 
-    /// <summary>
-    /// Check each edge of the collider and set velocity to 0 if colliding
-    /// </summary>
-    /// <param name="velocity">Velocity to zero out</param>
-    /// <returns>New velocity potentially zeroed out</returns>
-    private Vector2 ZeroOutCollisions(Vector2 velocity) {
-      if (raycastCollider.Collisions.Top.IsColliding() || raycastCollider.Collisions.Bottom.IsColliding()) velocity.y = 0;
-      if (raycastCollider.Collisions.Left.IsColliding() || raycastCollider.Collisions.Right.IsColliding()) velocity.x = 0;
-      return velocity;
+    private void OnCollisionExit2D(Collision2D collision) {
+      var movable = collision.gameObject.GetComponent<MovingObject2D>();
+      if (movable != null) {
+        transform.parent = null;
+      }
     }
   }
 }

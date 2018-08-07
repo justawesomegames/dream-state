@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DreamState {
   /// <summary>
-  /// PlatformerPhysics2DModifier encapsulates any changes to velocity outside
+  /// PlatformerPhysics2DModifier encapsulates any discrete changes to velocity outside
   /// of the standard PlatformerPhysics2D handling.
   /// </summary>
   public abstract class PlatformerPhysics2DModifier {
@@ -21,8 +21,8 @@ namespace DreamState {
     private string guid;
 
     /// <summary>
-    /// Called once per frame.
-    /// Modify velocity after physics has applied gravity and acceleration.
+    /// Called once per physics update.
+    /// Modify velocity after gravity and acceleration have been applied.
     /// </summary>
     /// <param name="v">Velocity after gravity and acceleration have been applied</param>
     /// <returns>New velocity</returns>

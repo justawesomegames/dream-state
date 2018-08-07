@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class SimpleFollow : MonoBehaviour {
@@ -10,7 +9,7 @@ public class SimpleFollow : MonoBehaviour {
     initPos = transform.position;
   }
 
-  private void Update() {
+  private void LateUpdate() {
     transform.position = new Vector3(target.position.x, target.position.y, initPos.z);
   }
 }

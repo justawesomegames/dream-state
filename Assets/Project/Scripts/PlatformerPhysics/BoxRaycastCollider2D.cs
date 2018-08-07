@@ -1,15 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace DreamState {
-  using System.Collections.Generic;
-  using Global;
-
+  [DisallowMultipleComponent]
   [RequireComponent(typeof(BoxCollider2D))]
   public class BoxRaycastCollider2D : MonoBehaviour {
     [HideInInspector] public CollisionInfo Collisions { get {
-      // Singleton
       if (_collisions == null) _collisions = new CollisionInfo(this);
       return _collisions;
     } }
@@ -57,27 +55,38 @@ namespace DreamState {
     }
 
     /// <summary>
-    /// Calculate collisions based on a potential movement
+    /// Calculate a new velocity and update collisions
     /// </summary>
-    /// <param name="moveAmount">Amount to move</param>
-    public void UpdateCollisions(Vector2 moveVector) {
+    /// <param name="moveVector">Intended new velocity</param>
+    /// <returns>Velocity adjusted for collisions</returns>
+    public Vector2 HandleNewVelocity(Vector2 moveVector) {
       ClearCollisions();
       UpdateRaycastOrigins();
 
-      Vector2 v = moveVector;
-      if (v.x != 0) v = UpdateHorizontalCollisions(v);
-      if (v.y != 0) UpdateVerticalCollisions(v);
+      if (moveVector.x != 0) {
+        moveVector = UpdateHorizontalCollisions(moveVector, moveVector.x > 0);
+      }
+      if (moveVector.y != 0) {
+        moveVector = UpdateVerticalCollisions(moveVector, moveVector.y > 0);
+      }
 
       PostUpdate();
+
+      return moveVector;
     }
 
-    private Vector2 UpdateVerticalCollisions(Vector2 moveVector) {
-      float yDir = Mathf.Sign(moveVector.y);
+    private Vector2 UpdateVerticalCollisions(Vector2 moveVector, bool up) {
+      float yDir = up ? 1 : -1;
+
       var rayLength = Mathf.Abs(moveVector.y) + skinWidth;
+      if (Mathf.Abs(moveVector.y) < skinWidth) rayLength = 2 * skinWidth;
+
       for (int i = 0; i < verticalRayCount; i++) {
         Vector2 rayOrigin = yDir == -1 ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
         rayOrigin += Vector2.right * (verticalRaySpacing * i + moveVector.x);
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * yDir, rayLength, collisionMask);
+
+        Debug.DrawRay(rayOrigin, Vector2.up * yDir);
 
         // Check if there was actually a collision
         if (!hit) continue;
@@ -99,17 +108,18 @@ namespace DreamState {
       return moveVector;
     }
 
-    private Vector2 UpdateHorizontalCollisions(Vector2 moveVector) {
-      float xDir = Mathf.Sign(moveVector.x);
-      var rayLength = Mathf.Abs(moveVector.x) + skinWidth;
+    private Vector2 UpdateHorizontalCollisions(Vector2 moveVector, bool right) {
+      float xDir = right ? 1 : -1;
 
-      // Don't cast farther than we need to
+      var rayLength = Mathf.Abs(moveVector.x) + skinWidth;
       if (Mathf.Abs(moveVector.x) < skinWidth) rayLength = 2 * skinWidth;
 
       for (int i = 0; i < horizontalRayCount; i++) {
         Vector2 rayOrigin = xDir == -1 ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;
         rayOrigin += Vector2.up * (horizontalRaySpacing * i);
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * xDir, rayLength, collisionMask);
+
+        Debug.DrawRay(rayOrigin, Vector2.right * xDir);
 
         // Check if there was actually a collision
         if (!hit) continue;
@@ -190,6 +200,19 @@ namespace DreamState {
 
       public bool IsColliding() {
         return hits.Count > 0;
+      }
+
+      public IEnumerable<GameObject> CollisionObjects() {
+        return hits.Select(h => h.transform.gameObject).ToList().Distinct();
+      }
+
+      public IEnumerable<int> CollidingObjectIds() {
+        return hits.Select(h => h.transform.gameObject.GetInstanceID()).Distinct();
+      }
+
+      public bool CollidingWith(GameObject g) {
+        var ids = CollidingObjectIds();
+        return hits.Count > 0 && ids.Contains(g.GetInstanceID());
       }
 
       public void Clear() {

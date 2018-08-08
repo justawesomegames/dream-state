@@ -12,13 +12,7 @@ namespace DreamState {
     private Dictionary<int, PlatformerPhysics2D> passengers = new Dictionary<int, PlatformerPhysics2D>();
     
     protected abstract Vector3 CalculateNewVelocity();
-
-    private void Awake() {
-      if (transform.parent == null) {
-        Debug.LogError("MovingObject2D should be nested under a parent object!");
-      }
-    }
-
+    
     private void Update() {
       velocity = CalculateNewVelocity();
 
@@ -28,7 +22,7 @@ namespace DreamState {
 
       HandlePassengers();
 
-      transform.parent.Translate(velocity);
+      transform.Translate(velocity);
     }
 
     private void HandlePassengers() {
@@ -59,7 +53,7 @@ namespace DreamState {
         return;
       }
       passengers.Add(key, passenger);
-      passenger.gameObject.transform.parent = transform.parent;
+      passenger.gameObject.transform.parent = transform;
     }
 
     private void Detach(PlatformerPhysics2D passenger) {

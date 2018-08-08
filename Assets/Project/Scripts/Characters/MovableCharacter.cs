@@ -6,11 +6,13 @@ namespace DreamState {
   [RequireComponent(typeof(Rigidbody2D))]
   public abstract class MovableCharacter : MonoBehaviour {
     public WallStick WallStick { get { return wallStick; } }
-    public bool Dashing { get { return dash.IsDashing; } }
+    public bool Dashing { get { return dash.IsDashing || chargeDash.IsDashing; } }
 
     [Header("Movement")]
     [SerializeField] protected float runSpeed = 10f;
     [SerializeField] protected Dash dash;
+    [SerializeField] protected ChargeDash chargeDash;
+    [SerializeField] protected float chargeDashTime = 2.0f;
 
     [Header("Jumping")]
     [SerializeField] protected float jumpForce = 20f;
@@ -34,6 +36,7 @@ namespace DreamState {
     private float curJumpToleranceTime;
     private float curWallJumpFloatTime;
     private bool didDashInAir = false;
+    private float curChargeDashTime = 0.0f;
 
     public virtual void HorizontalMove(float moveScalar) {
       physics.Move(Vector2.right * runSpeed * moveScalar, curWallJumpFloatTime >= wallJumpFloatTime);
@@ -83,9 +86,16 @@ namespace DreamState {
       }
     }
 
-    public virtual void OnDashHold() { }
+    public virtual void OnDashHold() {
+      curChargeDashTime += Time.deltaTime;
+    }
 
-    public virtual void OnDashRelease() { }
+    public virtual void OnDashRelease() {
+      if (curChargeDashTime > chargeDashTime) {
+        chargeDash.SetDashing(true, FacingRight());
+      }
+      curChargeDashTime = 0.0f;
+    }
 
     private void OnGroundedChange(bool grounded) {
       if (grounded) {
@@ -99,6 +109,7 @@ namespace DreamState {
     private void OnWallStickChange(bool stickingToWall) {
       if (stickingToWall) {
         dash.SetDashing(false);
+        chargeDash.SetDashing(false);
         didDashInAir = false;
         didDoubleJump = false;
       } else {
@@ -120,6 +131,7 @@ namespace DreamState {
       physics = GetComponent<PlatformerPhysics2D>();
       physics.RegisterModifier(wallStick);
       physics.RegisterModifier(dash);
+      physics.RegisterModifier(chargeDash);
       physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
 
       wallStick.OnWallStickChange(OnWallStickChange);

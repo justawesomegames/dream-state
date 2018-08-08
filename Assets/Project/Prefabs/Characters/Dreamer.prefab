@@ -42,7 +42,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1778227753367288}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.64, y: 19.17, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -124,7 +124,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gravityModifier: 1
   horizontalAcceleration: 3
-  terminalVelocity: 21
+  terminalVelocity: 20
 --- !u!114 &114211210019406146
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -149,9 +149,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   runSpeed: 10
   dash:
-    dashVelocity: {x: 20, y: 0}
-    dashTime: 0.3
+    dashVelocity: {x: 30, y: 0}
+    dashTime: 0.15
     dashTimeout: 0.2
+  chargeDash:
+    dashVelocity: {x: 30, y: 0}
+    dashTime: 1
+  chargeDashTime: 2
   jumpForce: 20
   doubleJumpForce: 15
   wallJump: {x: 20, y: 15}

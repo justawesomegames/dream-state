@@ -1,25 +1,19 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace DreamState {
   [Serializable]
-  public class Dash : PlatformerPhysics2DModifier {
+  public class ChargeDash : PlatformerPhysics2DModifier {
     public bool IsDashing { get { return isDashing; } }
 
     [SerializeField] private Vector2 dashVelocity = new Vector2(20, 0);
-    [SerializeField] private float dashTime = 0.2f;
-    [SerializeField] private float dashTimeout = 0.2f;
+    [SerializeField] private float dashTime = 1.0f;
 
     private bool isDashing;
     private bool facingRight;
     private float curDashTime;
-    private float curDashTimeout;
-    
-    public override Vector2 ModifyVelocity(Vector2 v) {
-      if (curDashTimeout < dashTimeout + dashTime) {
-        curDashTimeout += Time.deltaTime;
-      }
 
+    public override Vector2 ModifyVelocity(Vector2 v) {
       if (!isDashing) {
         return v;
       }
@@ -43,15 +37,9 @@ namespace DreamState {
         return;
       }
 
-      // Prevent dashing before timeout is up
-      if (curDashTimeout < dashTimeout + dashTime) {
-        return;
-      }
-
       // Start dashing
       facingRight = right;
       curDashTime = 0.0f;
-      curDashTimeout = 0.0f;
       isDashing = true;
     }
   }

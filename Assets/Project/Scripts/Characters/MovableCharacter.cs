@@ -62,6 +62,10 @@ namespace DreamState {
         didDoubleJump = true;
         physics.SetVelocityY(doubleJumpForce);
       }
+
+      if (chargeDash.IsDashing) {
+        chargeDash.SetDashing(false);
+      }
     }
 
     public virtual void OnJumpHold() { }
@@ -93,6 +97,9 @@ namespace DreamState {
     public virtual void OnDashRelease() {
       if (curChargeDashTime > chargeDashTime) {
         chargeDash.SetDashing(true, FacingRight());
+
+        // Prevent double jump out of a charge dash
+        didDoubleJump = true;
       }
       curChargeDashTime = 0.0f;
     }

@@ -8,10 +8,7 @@
 				public const string HORIZONTAL_AXIS = "Horizontal";
 				public const string JUMP = "Jump";
 				public const string DASH = "Dash";
-			}
-
-			public static class Collision {
-				public const string ONE_WAY_PLATFORM_TAG = "Through";
+        public const string ATTACK = "Attack";
 			}
 		}
 	}

@@ -3,11 +3,14 @@ using UnityEngine;
 
 namespace DreamState {
   [RequireComponent(typeof(Dreamer))]
+  [RequireComponent(typeof(AbilityManager))]
   public class PlayerInputController : MonoBehaviour {
     private Dreamer player;
+    private AbilityManager abilityManager;
 
     private void Awake() {
       player = GetComponent<Dreamer>();
+      abilityManager = GetComponent<AbilityManager>();
     }
 
     private void Update() {
@@ -31,6 +34,16 @@ namespace DreamState {
       }
       if (Input.GetButtonUp(Global.Constants.Input.DASH)) {
         player.OnDashRelease();
+      }
+
+      if (Input.GetButtonDown(Global.Constants.Input.ATTACK)) {
+        abilityManager.OnAbilityDown();
+      }
+      if (Input.GetButton(Global.Constants.Input.ATTACK)) {
+        abilityManager.OnAbilityHold();
+      }
+      if (Input.GetButtonUp(Global.Constants.Input.ATTACK)) {
+        abilityManager.OnAbilityUp();
       }
     }
   }

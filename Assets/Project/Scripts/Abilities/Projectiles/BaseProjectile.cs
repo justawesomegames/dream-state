@@ -61,11 +61,10 @@ namespace DreamState {
         var stats = hit.GetComponent<CharacterStats>();
         if (stats != null) {
           stats.Damage(damage);
+          // TODO: Object pooling
+          Destroy(gameObject);
         }
       }
-
-      // TODO: Object pooling
-      Destroy(gameObject);
     }
   }
 }

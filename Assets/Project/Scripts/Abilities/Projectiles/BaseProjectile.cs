@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace DreamState {
   [RequireComponent(typeof(Rigidbody2D))]
@@ -9,10 +10,12 @@ namespace DreamState {
     private float damage;
     private GameObject caster;
     private bool facingRight = true;
+    private List<string> damagesWhat;
 
-    public void Initialize(GameObject caster, BaseAbility ability) {
+    public void Initialize(GameObject caster, BaseAbility ability, List<string> damagesWhat) {
       damage = ability.Damage;
       this.caster = caster;
+      this.damagesWhat = damagesWhat;
 
       var casterSpriteRenderer = caster.GetComponent<SpriteRenderer>();
       if (casterSpriteRenderer != null) {
@@ -37,26 +40,31 @@ namespace DreamState {
       transform.Translate(velocity * Time.deltaTime);
     }
 
-    private void OnEnable() {
-      
-    }
-
     private void Update() {
       Step();
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
+      var hit = collision.gameObject;
       // Ignore collisions with the character who casted this projectile
-      if (collision.gameObject == caster) return;
+      if (hit == caster) return;
 
       // Destroy if colliding with whatever destroys this
-      if (destroysOnWhat == (destroysOnWhat | (1 << collision.gameObject.layer))) {
-        // TODO: Object pooling, just deactivate
+      if (destroysOnWhat == (destroysOnWhat | (1 << hit.layer))) {
+        // TODO: Object pooling
         Destroy(gameObject);
         return;
       }
 
-      // TODO: Handle damaging other characters
+      // Damage the object if it has stats
+      if (damagesWhat.Contains(hit.tag)) {
+        var stats = hit.GetComponent<CharacterStats>();
+        if (stats != null) {
+          stats.Damage(damage);
+          // TODO: Object pooling
+          Destroy(gameObject);
+        }
+      }
     }
   }
 }

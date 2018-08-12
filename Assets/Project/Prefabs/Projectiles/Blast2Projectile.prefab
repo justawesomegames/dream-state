@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 50154456200069642}
   - component: {fileID: 212587268127893284}
   - component: {fileID: 114784669432162956}
+  - component: {fileID: 95608060856371478}
   m_Layer: 10
   m_Name: Blast2Projectile
   m_TagString: Untagged
@@ -86,8 +87,26 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.81, y: 0.57}
   m_EdgeRadius: 0
+--- !u!95 &95608060856371478
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1213259892091864}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9ab61fd32ae1c4c4086e32afcd9a8da5, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &114784669432162956
 MonoBehaviour:
   m_ObjectHideFlags: 1

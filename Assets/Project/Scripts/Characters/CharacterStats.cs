@@ -26,7 +26,6 @@ namespace DreamState {
       }
     }
 
-    // Use this for initialization
     private void Awake() {
       currentHealth = maxHealth;
       currentResource = maxResource;

@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 50551708183874072}
   - component: {fileID: 212127833085799698}
   - component: {fileID: 114543609399349402}
+  - component: {fileID: 95659693448667656}
   m_Layer: 10
   m_Name: Blast3Projectile
   m_TagString: Untagged
@@ -88,6 +89,24 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!95 &95659693448667656
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1669532277612226}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d6894f617bc2bc74184ae99868cfb152, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &114543609399349402
 MonoBehaviour:
   m_ObjectHideFlags: 1

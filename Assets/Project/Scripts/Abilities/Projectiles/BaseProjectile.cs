@@ -7,6 +7,7 @@ namespace DreamState {
     [SerializeField] protected Vector2 velocity = Vector2.right;
     [SerializeField] protected LayerMask destroysOnWhat;
 
+    private SpriteRenderer spriteRenderer;
     private float damage;
     private GameObject caster;
     private bool facingRight = true;
@@ -22,7 +23,6 @@ namespace DreamState {
         facingRight = !casterSpriteRenderer.flipX;
       }
 
-      var spriteRenderer = GetComponent<SpriteRenderer>();
       if (spriteRenderer != null) {
         spriteRenderer.flipX = !facingRight;
       }
@@ -40,7 +40,16 @@ namespace DreamState {
       transform.Translate(velocity * Time.deltaTime);
     }
 
+    private void Awake() {
+      spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
     private void Update() {
+      // If out of bounds, just destroy this projectile
+      if (spriteRenderer != null && !spriteRenderer.IsVisibleFrom(Camera.main)) {
+        DestroyProjectile();
+        return;
+      }
       Step();
     }
 
@@ -51,8 +60,7 @@ namespace DreamState {
 
       // Destroy if colliding with whatever destroys this
       if (destroysOnWhat == (destroysOnWhat | (1 << hit.layer))) {
-        // TODO: Object pooling
-        Destroy(gameObject);
+        DestroyProjectile();
         return;
       }
 
@@ -61,10 +69,14 @@ namespace DreamState {
         var stats = hit.GetComponent<CharacterStats>();
         if (stats != null) {
           stats.Damage(damage);
-          // TODO: Object pooling
-          Destroy(gameObject);
+          DestroyProjectile();
         }
       }
+    }
+
+    private void DestroyProjectile() {
+      // TODO: Object pooling
+      Destroy(gameObject);
     }
   }
 }

@@ -21,6 +21,8 @@ namespace DreamState {
     [SerializeField] private float terminalVelocity = 20f;
     
     private BoxRaycastCollider2D raycastCollider;
+    private SpriteRenderer spriteRenderer;
+    private bool facingRight = true;
     private Vector2 currentVelocity;
     private Vector2 targetVelocity;
     private Dictionary<string, PlatformerPhysics2DModifier> modifiers = new Dictionary<string, PlatformerPhysics2DModifier>();
@@ -120,6 +122,7 @@ namespace DreamState {
 
     private void Awake() {
       raycastCollider = GetComponent<BoxRaycastCollider2D>();
+      spriteRenderer = GetComponent<SpriteRenderer>();
 
       var layerMask = raycastCollider.CollisionMask.value;
       if (layerMask == (layerMask | (1 << gameObject.layer))) {
@@ -130,6 +133,13 @@ namespace DreamState {
     private void LateUpdate() {
       currentVelocity = CalculateNewVelocity();
       HandleNewMovement(currentVelocity * Time.deltaTime);
+
+      if (TargetVelocity.x < 0.0f && facingRight) {
+        Flip(false);
+      }
+      else if (TargetVelocity.x > 0.0f && !facingRight) {
+        Flip(true);
+      }
     }
 
     private void HandleNewMovement(Vector2 newMove) {
@@ -172,6 +182,13 @@ namespace DreamState {
       }
 
       return newVelocity;
+    }
+
+    private void Flip(bool right) {
+      if (right != facingRight) {
+        spriteRenderer.flipX = !right;
+      }
+      facingRight = right;
     }
   }
 }

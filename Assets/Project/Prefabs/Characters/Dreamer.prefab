@@ -36,7 +36,6 @@ GameObject:
   - component: {fileID: 4561972165493298}
   - component: {fileID: 61823279785252152}
   - component: {fileID: 50175537036692076}
-  - component: {fileID: 114645009632150360}
   - component: {fileID: 114129786370640692}
   - component: {fileID: 114619582732366908}
   - component: {fileID: 114211210019406146}
@@ -135,6 +134,13 @@ MonoBehaviour:
   gravityModifier: 1
   horizontalAcceleration: 3
   terminalVelocity: 20
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 256
+  skinWidth: 0.015
+  distanceBetweenRays: 0.25
+  horizontalRayCount: 3
+  verticalRayCount: 3
 --- !u!114 &114152776325676804
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -191,24 +197,6 @@ MonoBehaviour:
   wallStick:
     wallSlideSpeed: 7
     wallStickTimeBeforeSlide: 0.2
---- !u!114 &114645009632150360
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1778227753367288}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7df93515547309641ba7a8fa70d77d80, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 256
-  skinWidth: 0.1
-  distanceBetweenRays: 0.25
-  horizontalRayCount: 2
-  verticalRayCount: 2
 --- !u!212 &212238826931822882
 SpriteRenderer:
   m_ObjectHideFlags: 1

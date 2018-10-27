@@ -76,6 +76,7 @@ namespace DreamState {
     /// </summary>
     /// <param name="moveAmount">Amount to move</param>
     public void MoveNow(Vector2 moveAmount) {
+      SetVelocity(moveAmount);
       HandleNewMovement(moveAmount);
     }
 
@@ -208,10 +209,10 @@ namespace DreamState {
       UpdateRaycastOrigins();
 
       if (newMove.x != 0) {
-        newMove = UpdateHorizontalCollisions(newMove, newMove.x > 0);
+        newMove = HorizontalMove(newMove);
       }
       if (newMove.y != 0) {
-        newMove = UpdateVerticalCollisions(newMove, newMove.y > 0);
+        newMove = VerticalMove(newMove);
       }
 
       transform.Translate(newMove);
@@ -255,8 +256,8 @@ namespace DreamState {
       return newVelocity;
     }
 
-    private Vector2 UpdateVerticalCollisions(Vector2 moveVector, bool up) {
-      float yDir = up ? 1 : -1;
+    private Vector2 VerticalMove(Vector2 moveVector) {
+      var yDir = moveVector.y > 0 ? 1 : -1;
 
       var rayLength = Mathf.Abs(moveVector.y) + skinWidth;
       if (Mathf.Abs(moveVector.y) < skinWidth) rayLength = 2 * skinWidth;
@@ -288,8 +289,8 @@ namespace DreamState {
       return moveVector;
     }
 
-    private Vector2 UpdateHorizontalCollisions(Vector2 moveVector, bool right) {
-      float xDir = right ? 1 : -1;
+    private Vector2 HorizontalMove(Vector2 moveVector) {
+      var xDir = moveVector.x > 0 ? 1 : -1;
 
       var rayLength = Mathf.Abs(moveVector.x) + skinWidth;
       if (Mathf.Abs(moveVector.x) < skinWidth) rayLength = 2 * skinWidth;

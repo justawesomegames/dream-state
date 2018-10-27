@@ -963,13 +963,7 @@ Prefab:
       propertyPath: m_RootOrder
       value: 18
       objectReference: {fileID: 0}
-    - target: {fileID: 114129786370640692, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: collisionMask.m_Bits
-      value: 256
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 114645009632150360, guid: 47c864d037cb14a91b912e7c3f68187c, type: 2}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 47c864d037cb14a91b912e7c3f68187c, type: 2}
   m_IsPrefabAsset: 0
 --- !u!4 &1107983062 stripped

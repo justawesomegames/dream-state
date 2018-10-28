@@ -54,4 +54,8 @@
   },
   "editor.formatOnSave": true,
   "csharp.referencesCodeLens.enabled": false,
+  "editor.tabSize": 2,
+  "files.trimTrailingWhitespace": true,
+  "editor.detectIndentation": false,
+  "editor.insertSpaces": true,
 }

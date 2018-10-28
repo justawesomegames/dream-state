@@ -6,8 +6,7 @@ using UnityEngine;
 namespace DreamState {
   /// <summary>
   /// PlatformerPhysics2D handles 2D physics separately from the Unity physics engine
-  /// by utilizing raycasts for collision detection. By default, the PlatformerPhysics2D
-  /// will handle gravity and translating the object with the given inputs.
+  /// by utilizing raycasts for collision detection.
   /// </summary>
   [DisallowMultipleComponent]
   [RequireComponent(typeof(BoxCollider2D))]
@@ -35,10 +34,11 @@ namespace DreamState {
 
     [Header("Collision Configuration")]
     [SerializeField] private LayerMask collisionMask;
-    [SerializeField] private float skinWidth = 0.015f;
+    [SerializeField] private float skinWidth = 0.05f;
     [SerializeField] private float distanceBetweenRays = 0.25f;
     [SerializeField] private int horizontalRayCount = 3;
     [SerializeField] private int verticalRayCount = 3;
+    [SerializeField] private float maxSlopeAngleDegrees = 45;
 
     public Vector2 CurrentVelocity { get { return currentVelocity; } }
     public Vector2 TargetVelocity { get { return targetVelocity; } }
@@ -163,7 +163,7 @@ namespace DreamState {
       CalculateRaySpacing();
     }
 
-    private void LateUpdate() {
+    private void Update() {
       currentVelocity = CalculateNewVelocity();
       HandleNewMovement(currentVelocity * Time.deltaTime);
 
@@ -204,13 +204,20 @@ namespace DreamState {
     }
 
     private void HandleNewMovement(Vector2 newMove) {
-      collisions.Reset();
-
       UpdateRaycastOrigins();
+      collisions.Reset();
+      collisions.LastMoveAmount = newMove;
+
+      if (newMove.y < 0) {
+        newMove = DescendSlope(newMove);
+      }
 
       if (newMove.x != 0) {
-        newMove = HorizontalMove(newMove);
+        collisions.LastFacingDir = (int)Mathf.Sign(newMove.x);
       }
+
+      newMove = HorizontalMove(newMove);
+
       if (newMove.y != 0) {
         newMove = VerticalMove(newMove);
       }
@@ -263,9 +270,9 @@ namespace DreamState {
       if (Mathf.Abs(moveVector.y) < skinWidth) rayLength = 2 * skinWidth;
 
       for (int i = 0; i < verticalRayCount; i++) {
-        Vector2 rayOrigin = yDir == -1 ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
+        var rayOrigin = yDir == -1 ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
         rayOrigin += Vector2.right * (verticalRaySpacing * i + moveVector.x);
-        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * yDir, rayLength, collisionMask);
+        var hit = Physics2D.Raycast(rayOrigin, Vector2.up * yDir, rayLength, collisionMask);
 
         Debug.DrawRay(rayOrigin, Vector2.up * yDir);
 
@@ -278,6 +285,10 @@ namespace DreamState {
         // Reduce ray length to avoid unnecessary collisions
         rayLength = hit.distance;
 
+        if (collisions.ClimbingSlope) {
+          moveVector.x = moveVector.y / Mathf.Tan(collisions.CurSlopeAngle * Mathf.Deg2Rad) * Mathf.Sign(moveVector.y);
+        }
+
         // Add collision to the appropriate collider
         if (yDir == -1) {
           Collisions.Bottom.AddHit(hit);
@@ -286,19 +297,33 @@ namespace DreamState {
         }
       }
 
+      if (collisions.ClimbingSlope) {
+        var xDir = Mathf.Sign(moveVector.x);
+        rayLength = Mathf.Abs(moveVector.x) + skinWidth;
+        var rayOrigin = ((xDir == -1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight) + Vector2.up * moveVector.y;
+        var hit = Physics2D.Raycast(rayOrigin, Vector2.right * xDir, rayLength, collisionMask);
+        if (hit) {
+          var angle = Vector2.Angle(hit.normal, Vector2.up);
+          if (angle != collisions.CurSlopeAngle) {
+            moveVector.x = (hit.distance - skinWidth) * xDir;
+            collisions.CurSlopeAngle = angle;
+          }
+        }
+      }
+
       return moveVector;
     }
 
     private Vector2 HorizontalMove(Vector2 moveVector) {
-      var xDir = moveVector.x > 0 ? 1 : -1;
+      var xDir = collisions.LastFacingDir;
 
       var rayLength = Mathf.Abs(moveVector.x) + skinWidth;
       if (Mathf.Abs(moveVector.x) < skinWidth) rayLength = 2 * skinWidth;
 
       for (int i = 0; i < horizontalRayCount; i++) {
-        Vector2 rayOrigin = xDir == -1 ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;
+        var rayOrigin = xDir == -1 ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;
         rayOrigin += Vector2.up * (horizontalRaySpacing * i);
-        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * xDir, rayLength, collisionMask);
+        var hit = Physics2D.Raycast(rayOrigin, Vector2.right * xDir, rayLength, collisionMask);
 
         Debug.DrawRay(rayOrigin, Vector2.right * xDir);
 
@@ -306,18 +331,93 @@ namespace DreamState {
         if (!hit) continue;
         if (hit.distance == 0) continue;
 
-        // Let collision affect other ray collision detection
-        moveVector.x = (hit.distance - skinWidth) * xDir;
+        var angle = Mathf.Abs(Vector2.Angle(hit.normal, Vector2.up));
 
-        // Reduce ray length to avoid unnecessary collisions
-        rayLength = hit.distance;
+        if (i == 0 && angle <= maxSlopeAngleDegrees) {
+          if (collisions.DescendingSlope) {
+            collisions.DescendingSlope = false;
+            moveVector = collisions.LastMoveAmount;
+          }
 
-        // Add collision to the appropriate collider
-        if (xDir == -1) {
-          Collisions.Left.AddHit(hit);
-        } else {
-          Collisions.Right.AddHit(hit);
+          var distanceToSlope = 0f;
+          if (angle != collisions.LastSlopeAngle) {
+            distanceToSlope = hit.distance - skinWidth;
+            moveVector.x -= distanceToSlope * xDir;
+          }
+
+          // Climb slope
+          var angleInRads = angle * Mathf.Deg2Rad;
+          var absMoveX = Mathf.Abs(moveVector.x);
+          var heightToClimb = Mathf.Sin(angleInRads) * absMoveX;
+          if (moveVector.y <= heightToClimb) {
+            moveVector.y = heightToClimb;
+            moveVector.x = Mathf.Cos(angleInRads) * absMoveX * Mathf.Sign(moveVector.x);
+            collisions.CurSlopeAngle = angle;
+            collisions.ClimbingSlope = true;
+            Collisions.Bottom.AddHit(hit);
+          }
+
+          moveVector.x += distanceToSlope * xDir;
         }
+
+        if (!collisions.ClimbingSlope || angle > maxSlopeAngleDegrees) {
+          // Let collision affect other ray collision detection
+          moveVector.x = (hit.distance - skinWidth) * xDir;
+          // Reduce ray length to avoid unnecessary collisions
+          rayLength = hit.distance;
+
+          if (collisions.ClimbingSlope) {
+            moveVector.y = Mathf.Tan(collisions.CurSlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(moveVector.x);
+          }
+
+          // Add collision to the appropriate collider
+          if (xDir == -1) {
+            Collisions.Left.AddHit(hit);
+          } else {
+            Collisions.Right.AddHit(hit);
+          }
+        }
+      }
+
+      return moveVector;
+    }
+
+    private Vector2 DescendSlope(Vector2 moveVector) {
+      var maxSlopeHitLeft = Physics2D.Raycast(raycastOrigins.bottomLeft, Vector2.down, Mathf.Abs(moveVector.y) + skinWidth, collisionMask);
+      var maxSlopeHitRight = Physics2D.Raycast(raycastOrigins.bottomRight, Vector2.down, Mathf.Abs(moveVector.y) + skinWidth, collisionMask);
+      if (maxSlopeHitLeft ^ maxSlopeHitRight) {
+        moveVector = SlideDownMaxSlope(maxSlopeHitLeft, moveVector);
+        moveVector = SlideDownMaxSlope(maxSlopeHitRight, moveVector);
+      }
+
+      var xDir = Mathf.Sign(moveVector.x);
+      var rayOrigin = (xDir == -1) ? raycastOrigins.bottomRight : raycastOrigins.bottomLeft;
+      var hit = Physics2D.Raycast(rayOrigin, Vector2.down, Mathf.Infinity, collisionMask);
+
+      if (!hit) return moveVector;
+
+      var angle = Vector2.Angle(hit.normal, Vector2.up);
+      if (angle != 0 && angle <= maxSlopeAngleDegrees && hit.distance - skinWidth <= Mathf.Tan(angle * Mathf.Deg2Rad) * Mathf.Abs(moveVector.x)) {
+        var absX = Mathf.Abs(moveVector.x);
+        var descendMoveY = Mathf.Sin(angle * Mathf.Deg2Rad) * absX;
+        moveVector.x = Mathf.Cos(angle * Mathf.Deg2Rad) * absX * xDir;
+        moveVector.y -= descendMoveY;
+        collisions.CurSlopeAngle = angle;
+        collisions.DescendingSlope = true;
+        Collisions.Bottom.AddHit(hit);
+      }
+
+      return moveVector;
+    }
+
+    private Vector2 SlideDownMaxSlope(RaycastHit2D hit, Vector2 moveVector) {
+      if (!hit) return moveVector;
+
+      var angle = Vector2.Angle(hit.normal, Vector2.up);
+      if (angle > maxSlopeAngleDegrees) {
+        moveVector.x = Mathf.Sign(hit.normal.x) * (Mathf.Abs(moveVector.y) - hit.distance) / Mathf.Tan(angle * Mathf.Deg2Rad);
+        collisions.CurSlopeAngle = angle;
+        collisions.SlidingDownMaxSlope = true;
       }
 
       return moveVector;

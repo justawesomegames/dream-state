@@ -25,8 +25,7 @@ namespace DreamState {
 
       private StickToWall wallStick;
       private bool didDoubleJump;
-      private float curJumpToleranceTime;
-      private bool didDashInAir;
+      private bool canCoyoteJump;
 
       public override void Initialize() {
         physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
@@ -36,11 +35,7 @@ namespace DreamState {
         }
       }
 
-      public override void Do() {
-        if (curJumpToleranceTime < jumpTolerance) {
-          curJumpToleranceTime += Time.deltaTime;
-        }
-      }
+      public override void Do() { }
 
       public virtual void OnJumpPress() {
         if (wallStick != null && wallStick.StickingToWall) {
@@ -52,7 +47,7 @@ namespace DreamState {
         var grounded = physics.Grounded();
 
         // Handle jumping from ground
-        if (grounded || curJumpToleranceTime < jumpTolerance) {
+        if (grounded || canCoyoteJump) {
           physics.SetVelocityY(jumpForce);
           return;
         }
@@ -72,15 +67,15 @@ namespace DreamState {
           physics.SetVelocityY(0);
         }
 
-        // Prevent tolerant jump if already jumped
-        curJumpToleranceTime = jumpTolerance;
+        // Prevent coyote jump if already jumped
+        canCoyoteJump = false;
       }
 
       private void OnGroundedChange(bool grounded) {
         if (grounded) {
           didDoubleJump = false;
         } else {
-          curJumpToleranceTime = 0.0f;
+          StartCoroutine(CoyoteJump());
         }
       }
 
@@ -88,19 +83,21 @@ namespace DreamState {
         if (stickingToWall) {
           didDoubleJump = false;
         } else {
-          curJumpToleranceTime = 0.0f;
+          StartCoroutine(CoyoteJump());
         }
+      }
+
+      private IEnumerator CoyoteJump() {
+        canCoyoteJump = true;
+        yield return new WaitForSeconds(jumpTolerance);
+        canCoyoteJump = false;
       }
 
       private IEnumerator HandleWallJumpAcceleration() {
         var initialAcceleration = physics.HorizontalAcceleration;
         physics.HorizontalAcceleration = wallJumpAirAcceleration;
 
-        var curWallJumpFloatTime = 0.0f;
-        while (curWallJumpFloatTime < wallJumpFloatTime) {
-          curWallJumpFloatTime += Time.deltaTime;
-          yield return null;
-        }
+        yield return new WaitForSeconds(wallJumpFloatTime);
 
         physics.HorizontalAcceleration = initialAcceleration;
       }

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace DreamState {
@@ -9,11 +10,20 @@ namespace DreamState {
     public class GroundDash : Ability {
       [SerializeField] private float dashSpeed = 20f;
       [SerializeField] private float dashTime = 0.2f;
-      [SerializeField] private float dashTimeout = 0.2f;
+      [SerializeField] private float dashCooldown = 0.2f;
+
+      private bool inDashCooldown;
 
       public override void Do() {
         // TODO
       }
+
+      private IEnumerator DashCooldown() {
+        inDashCooldown = true;
+        yield return new WaitForSeconds(dashCooldown);
+        inDashCooldown = false;
+      }
+
 
       // public void OnDashPress() {
       //   if (didDashInAir || (wallStick != null && wallStick.StickingToWall)) {

@@ -5,14 +5,14 @@ namespace DreamState {
   [DisallowMultipleComponent]
   public class DreamerAnimator : MonoBehaviour {
     private Dreamer dreamer;
-    private PlatformerPhysics2D physics;
+    private Physics.PlatformerPhysics physics;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     private bool facingRight = true;
-    
+
     private void Awake() {
       dreamer = GetComponent<Dreamer>();
-      physics = GetComponent<PlatformerPhysics2D>();
+      physics = GetComponent<Physics.PlatformerPhysics>();
       animator = GetComponent<Animator>();
       spriteRenderer = GetComponent<SpriteRenderer>();
     }

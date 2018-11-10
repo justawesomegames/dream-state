@@ -1,4 +1,5 @@
 using UnityEngine;
+using DreamState.Physics;
 
 namespace DreamState {
   [RequireComponent(typeof(Dreamer))]
@@ -6,10 +7,12 @@ namespace DreamState {
   public class PlayerInputController : MonoBehaviour {
     private Dreamer player;
     private AbilityManager abilityManager;
+    private ChargeDash chargeDash;
 
     private void Awake() {
       player = GetComponent<Dreamer>();
       abilityManager = GetComponent<AbilityManager>();
+      chargeDash = GetComponent<ChargeDash>();
       RegisterInputHandlers();
     }
 

@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace DreamState {
   [DisallowMultipleComponent]
-  public class MovingPlatform : MovingObject2D {
+  public class MovingPlatform : Physics.MovingObject2D {
     [SerializeField] private Vector3[] waypoints = new Vector3[1];
     [SerializeField] private float speed = 5f;
     [SerializeField] private bool cyclic;

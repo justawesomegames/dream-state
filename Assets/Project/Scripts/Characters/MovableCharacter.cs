@@ -1,17 +1,19 @@
 using UnityEngine;
+using DreamState.Physics;
 
 namespace DreamState {
   [DisallowMultipleComponent]
-  [RequireComponent(typeof(PlatformerPhysics2D))]
-  [RequireComponent(typeof(Rigidbody2D))]
+  [RequireComponent(typeof(PlatformerPhysics))]
   public abstract class MovableCharacter : MonoBehaviour {
     public WallStick WallStick { get { return wallStick; } }
-    public bool Dashing { get { return dash.IsDashing || chargeDash.IsDashing; } }
+    public bool Dashing {
+      get {
+        return (dash != null && dash.IsDashing) || (chargeDash != null && chargeDash.IsDashing);
+      }
+    }
 
     [Header("Movement")]
     [SerializeField] protected float runSpeed = 10f;
-    [SerializeField] protected Dash dash;
-    [SerializeField] protected ChargeDash chargeDash;
     [SerializeField] protected float chargeDashTime = 2.0f;
 
     [Header("Jumping")]
@@ -25,12 +27,12 @@ namespace DreamState {
     [SerializeField]
     protected float wallJumpFloatTime = 0.2f;
 
-    [Header("Wall Stick")]
-    [SerializeField] protected WallStick wallStick;
-
-    protected PlatformerPhysics2D physics;
+    protected PlatformerPhysics physics;
     protected Rigidbody2D rigidBody;
     protected SpriteRenderer spriteRenderer;
+    protected WallStick wallStick;
+    protected Dash dash;
+    protected ChargeDash chargeDash;
 
     private bool didDoubleJump;
     private float curJumpToleranceTime;
@@ -44,7 +46,7 @@ namespace DreamState {
 
     public virtual void OnJumpPress() {
       // Handle wall jumping
-      if (wallStick.StickingToWall) {
+      if (wallStick != null && wallStick.StickingToWall) {
         JumpOffWall();
         return;
       }
@@ -63,7 +65,7 @@ namespace DreamState {
         physics.SetVelocityY(doubleJumpForce);
       }
 
-      if (chargeDash.IsDashing) {
+      if (chargeDash != null && chargeDash.IsDashing) {
         chargeDash.SetDashing(false);
       }
     }
@@ -73,7 +75,7 @@ namespace DreamState {
     public virtual void OnJumpRelease() {
       var gDir = physics.GravityDirection();
       if ((gDir == -1 && physics.CurrentVelocity.y > 0.0f || gDir == 1 && physics.CurrentVelocity.y < 0.0f)) {
-        physics.SetVelocityY(0);  
+        physics.SetVelocityY(0);
       }
 
       // Prevent tolerant jump if already jumped
@@ -81,7 +83,11 @@ namespace DreamState {
     }
 
     public virtual void OnDashPress() {
-      if (didDashInAir || wallStick.StickingToWall) {
+      if (dash == null) {
+        return;
+      }
+
+      if (didDashInAir || (wallStick != null && wallStick.StickingToWall)) {
         return;
       }
       dash.SetDashing(true, FacingRight());
@@ -95,7 +101,7 @@ namespace DreamState {
     }
 
     public virtual void OnDashRelease() {
-      if (curChargeDashTime > chargeDashTime) {
+      if (chargeDash != null && curChargeDashTime > chargeDashTime) {
         chargeDash.SetDashing(true, FacingRight());
 
         // Prevent double jump out of a charge dash
@@ -115,8 +121,8 @@ namespace DreamState {
 
     private void OnWallStickChange(bool stickingToWall) {
       if (stickingToWall) {
-        dash.SetDashing(false);
-        chargeDash.SetDashing(false);
+        if (dash != null) dash.SetDashing(false);
+        if (chargeDash != null) chargeDash.SetDashing(false);
         didDashInAir = false;
         didDoubleJump = false;
       } else {
@@ -134,14 +140,15 @@ namespace DreamState {
     private void Awake() {
       rigidBody = GetComponent<Rigidbody2D>();
       spriteRenderer = GetComponent<SpriteRenderer>();
+      physics = GetComponent<PlatformerPhysics>();
+      wallStick = GetComponent<WallStick>();
+      dash = GetComponent<Dash>();
+      chargeDash = GetComponent<ChargeDash>();
 
-      physics = GetComponent<PlatformerPhysics2D>();
-      physics.RegisterModifier(wallStick);
-      physics.RegisterModifier(dash);
-      physics.RegisterModifier(chargeDash);
       physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
-
-      wallStick.OnWallStickChange(OnWallStickChange);
+      if (wallStick != null) {
+        wallStick.OnWallStickChange(OnWallStickChange);
+      }
 
       curWallJumpFloatTime = wallJumpFloatTime;
     }

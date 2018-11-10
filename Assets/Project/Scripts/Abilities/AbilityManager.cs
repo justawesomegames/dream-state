@@ -9,12 +9,10 @@ namespace DreamState {
     [SerializeField] private Transform rangeAbilitySpawnPoint;
     [SerializeField] private List<string> damagesWhichTags;
 
-    private SpriteRenderer spriteRenderer;
     private CharacterStats characterStats;
     private float[] cooldowns;
     private int curAbilityIndex;
     private float curChargeTime;
-    private bool facingRight = true;
 
     public void OnAbilityDown() {
       if (cooldowns[curAbilityIndex] > 0) {
@@ -77,23 +75,14 @@ namespace DreamState {
 
     private void OnEnable() {
       cooldowns = new float[abilities.Count];
-      spriteRenderer = GetComponent<SpriteRenderer>();
       characterStats = GetComponent<CharacterStats>();
     }
 
     private void Update() {
-      for(int i = 0; i < cooldowns.Length; i++) {
+      for (int i = 0; i < cooldowns.Length; i++) {
         if (cooldowns[i] > 0) {
           cooldowns[i] -= Time.deltaTime;
         }
-      }
-
-      // If sprite has flipped, set spawn point appropriately
-      if (spriteRenderer != null && !spriteRenderer.flipX != facingRight) {
-        var curSpawn = rangeAbilitySpawnPoint.transform.localPosition;
-        curSpawn.x *= -1;
-        rangeAbilitySpawnPoint.transform.localPosition = curSpawn;
-        facingRight = !spriteRenderer.flipX;
       }
     }
   }

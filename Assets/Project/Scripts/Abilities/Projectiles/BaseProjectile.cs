@@ -18,9 +18,9 @@ namespace DreamState {
       this.caster = caster;
       this.damagesWhat = damagesWhat;
 
-      var casterSpriteRenderer = caster.GetComponent<SpriteRenderer>();
-      if (casterSpriteRenderer != null) {
-        facingRight = !casterSpriteRenderer.flipX;
+      var casterFaceable = caster.GetComponent<IFaceable>();
+      if (casterFaceable != null) {
+        facingRight = casterFaceable.IsFacing(FacingDir.Right);
       }
 
       if (spriteRenderer != null) {

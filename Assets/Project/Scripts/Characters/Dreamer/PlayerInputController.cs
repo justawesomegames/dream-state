@@ -2,35 +2,38 @@ using UnityEngine;
 using DreamState.Physics;
 
 namespace DreamState {
-  [RequireComponent(typeof(Dreamer))]
   [RequireComponent(typeof(AbilityManager))]
+  [RequireComponent(typeof(HorizontalMovement))]
+  [RequireComponent(typeof(Jump))]
   public class PlayerInputController : MonoBehaviour {
-    private Dreamer player;
     private AbilityManager abilityManager;
     private ChargeDash chargeDash;
+    private HorizontalMovement horizontalMovement;
+    private Jump jump;
 
     private void Awake() {
-      player = GetComponent<Dreamer>();
       abilityManager = GetComponent<AbilityManager>();
       chargeDash = GetComponent<ChargeDash>();
+      horizontalMovement = GetComponent<HorizontalMovement>();
+      jump = GetComponent<Jump>();
       RegisterInputHandlers();
     }
 
     private void RegisterInputHandlers() {
       // Horizontal movement
       InputManager.Instance.RegisterEvent(InputContexts.Playing, InputAxes.Horizontal, (moveAmt) => {
-        player.HorizontalMove(moveAmt);
+        horizontalMovement.Move(moveAmt);
       });
 
       // Jumping
-      InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Down, player.OnJumpPress);
-      InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Hold, player.OnJumpHold);
-      InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Up, player.OnJumpRelease);
+      InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Down, jump.OnJumpPress);
+      InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Hold, jump.OnJumpHold);
+      InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Up, jump.OnJumpRelease);
 
       // Dashing
-      InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Down, player.OnDashPress);
-      InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Hold, player.OnDashHold);
-      InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Up, player.OnDashRelease);
+      // InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Down, player.OnDashPress);
+      // InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Hold, player.OnDashHold);
+      // InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Up, player.OnDashRelease);
 
       // Attacking
       InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Down, abilityManager.OnAbilityDown);

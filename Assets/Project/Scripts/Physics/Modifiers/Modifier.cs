@@ -18,18 +18,18 @@ namespace DreamState {
       /// <returns>New velocity</returns>
       public abstract Vector2 ModifyVelocity(Vector2 v);
 
-      private void OnEnable() {
-        physics = GetComponent<PlatformerPhysics>();
-        physics.RegisterModifier(this);
-      }
+      // private void OnEnable() {
+      //   physics = GetComponent<PlatformerPhysics>();
+      //   physics.RegisterModifier(this);
+      // }
 
-      private void OnDestroy() {
-        physics.RemoveModifier(this);
-      }
+      // private void OnDestroy() {
+      //   physics.RemoveModifier(this);
+      // }
 
-      private void OnDisable() {
-        physics.RemoveModifier(this);
-      }
+      // private void OnDisable() {
+      //   physics.RemoveModifier(this);
+      // }
     }
   }
 }

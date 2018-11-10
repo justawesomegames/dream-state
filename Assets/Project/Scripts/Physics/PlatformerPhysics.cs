@@ -31,7 +31,7 @@ namespace DreamState {
       [HideInInspector] public LayerMask CollisionMask { get { return collisionMask; } }
 
       [SerializeField] private float gravityModifier = 1.0f;
-      [SerializeField] private float horizontalAcceleration = 2f;
+      [SerializeField] private float horizontalAcceleration = 50f;
       [SerializeField] private float terminalVelocity = 20f;
 
       [Header("Collision Configuration")]
@@ -45,6 +45,10 @@ namespace DreamState {
       public Vector2 CurrentVelocity { get { return currentVelocity; } }
       public Vector2 TargetVelocity { get { return targetVelocity; } }
       public float SkinWidth { get { return skinWidth; } }
+      public float HorizontalAcceleration {
+        get { return horizontalAcceleration; }
+        set { horizontalAcceleration = value; }
+      }
 
       private BoxCollisionInfo collisions;
       private BoxCollider2D boxCollider;
@@ -55,7 +59,8 @@ namespace DreamState {
       private bool facingRight = true;
       private Vector2 currentVelocity;
       private Vector2 targetVelocity;
-      private List<Modifier> modifiers = new List<Modifier>();
+      private List<Ability> abilities = new List<Ability>();
+      private IFaceable faceable;
 
       /// <summary>
       /// Move object at a speed
@@ -107,6 +112,10 @@ namespace DreamState {
         currentVelocity.y = newY * -GravityDirection();
       }
 
+      public void SetHorizontalAcceleration(float newAcceleration) {
+        horizontalAcceleration = newAcceleration;
+      }
+
       /// <summary>
       /// Based on current gravity direction, check top or bottom collider for collision
       /// </summary>
@@ -124,24 +133,25 @@ namespace DreamState {
       }
 
       /// <summary>
-      /// Add a modifier to this physics object
+      /// Adds an ability to this physics object
       /// </summary>
-      /// <param name="m">Modifier to add</param>
-      public void RegisterModifier(Modifier m) {
-        modifiers.Add(m);
+      /// <param name="ability"></param>
+      public void RegisterAbility(Ability ability) {
+        abilities.Add(ability);
       }
 
       /// <summary>
-      /// Remove a modifier from this physics object
+      /// Removes an ability from this physics object
       /// </summary>
-      /// <param name="modifier">Modifier to remove</param>
-      public void RemoveModifier(Modifier modifier) {
-        modifiers.Remove(modifier);
+      /// <param name="ability"></param>
+      public void RemoveAbility(Ability ability) {
+        abilities.Remove(ability);
       }
 
       private void Awake() {
         spriteRenderer = GetComponent<SpriteRenderer>();
         boxCollider = GetComponent<BoxCollider2D>();
+        faceable = GetComponent<IFaceable>();
 
         var layerMask = collisionMask.value;
         if (layerMask == (layerMask | (1 << gameObject.layer))) {
@@ -154,14 +164,14 @@ namespace DreamState {
       }
 
       private void Update() {
+        // First, let the physical world act on the object
         currentVelocity = CalculateNewVelocity();
-        HandleNewMovement(currentVelocity * Time.deltaTime);
 
-        if (TargetVelocity.x < 0.0f && facingRight) {
-          Flip(false);
-        } else if (TargetVelocity.x > 0.0f && !facingRight) {
-          Flip(true);
-        }
+        // Then account for any abilities this physical object may have
+        abilities.ForEach(a => a.Do());
+
+        // Finally, actually move the object
+        HandleNewMovement(currentVelocity * Time.deltaTime);
       }
 
       /// <summary>
@@ -244,9 +254,6 @@ namespace DreamState {
         } else if (currentVelocity.x > targetVelocity.x) {
           newVelocity.x = Mathf.Max(newVelocity.x - horizontalAcceleration, targetVelocity.x);
         }
-
-        // Account for any modifiers
-        modifiers.ForEach(m => newVelocity = m.ModifyVelocity(newVelocity));
 
         return newVelocity;
       }
@@ -409,13 +416,6 @@ namespace DreamState {
         }
 
         return moveVector;
-      }
-
-      private void Flip(bool right) {
-        if (right != facingRight) {
-          spriteRenderer.flipX = !right;
-        }
-        facingRight = right;
       }
     }
   }

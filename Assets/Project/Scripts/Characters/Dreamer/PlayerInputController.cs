@@ -5,17 +5,19 @@ namespace DreamState {
   [RequireComponent(typeof(AbilityManager))]
   [RequireComponent(typeof(HorizontalMovement))]
   [RequireComponent(typeof(Jump))]
+  [RequireComponent(typeof(Dash))]
   public class PlayerInputController : MonoBehaviour {
     private AbilityManager abilityManager;
-    private ChargeDash chargeDash;
     private HorizontalMovement horizontalMovement;
     private Jump jump;
+    private Dash dash;
 
     private void Awake() {
       abilityManager = GetComponent<AbilityManager>();
-      chargeDash = GetComponent<ChargeDash>();
       horizontalMovement = GetComponent<HorizontalMovement>();
       jump = GetComponent<Jump>();
+      dash = GetComponent<Dash>();
+
       RegisterInputHandlers();
     }
 
@@ -31,9 +33,9 @@ namespace DreamState {
       InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Up, jump.OnJumpRelease);
 
       // Dashing
-      // InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Down, player.OnDashPress);
-      // InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Hold, player.OnDashHold);
-      // InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Up, player.OnDashRelease);
+      InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Down, dash.StartDash);
+      InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Hold, dash.HoldDash);
+      InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Up, dash.OnDashRelease);
 
       // Attacking
       InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Down, abilityManager.OnAbilityDown);

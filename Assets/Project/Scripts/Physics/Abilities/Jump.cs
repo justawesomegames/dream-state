@@ -10,41 +10,37 @@ namespace DreamState {
     [DisallowMultipleComponent]
     public class Jump : Ability {
       [SerializeField] private float jumpForce = 20f;
+      [SerializeField] private float doubleJumpForce = 15f;
       [SerializeField] private float jumpTolerance = 0.2f;
       [SerializeField] private bool canDoubleJump = false;
 
       [Header("Wall Jump")]
-      [SerializeField] private float doubleJumpForce = 15f;
       [SerializeField] private Vector2 wallJump = new Vector2(15f, 15f);
+      [SerializeField] private Vector2 dashWallJump = new Vector2(20f, 20f);
       [Tooltip("Horizontal acceleration for <wallJumpFloatTime> after wall jump")]
       [SerializeField]
       private float wallJumpAirAcceleration = 2f;
+      [SerializeField] private float dashWallJumpAirAcceleration = 4f;
       [Tooltip("Amount of time to apply acceleration after wall jump before re-enabling previous horizontal acceleration")]
       [SerializeField]
       protected float wallJumpFloatTime = 0.2f;
 
       private StickToWall wallStick;
+      private Dash dash;
       private bool didDoubleJump;
       private bool canCoyoteJump;
-
-      public override void Initialize() {
-        physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
-        wallStick = GetComponent<StickToWall>();
-        if (wallStick != null) {
-          wallStick.OnWallStickChange(OnWallStickChange);
-        }
-      }
 
       public override void Do() { }
 
       public virtual void OnJumpPress() {
-        if (wallStick != null && wallStick.StickingToWall) {
+        if (wallStick != null && wallStick.Doing) {
           StartCoroutine(HandleWallJumpAcceleration());
-          physics.SetVelocity(new Vector2(-(wallJump.x * Mathf.Sign(physics.TargetVelocity.x)), wallJump.y));
+          Vector2 vWallJump = (dash != null && dash.HoldingDash) ? dashWallJump : wallJump;
+          physics.SetVelocity(new Vector2(-(vWallJump.x * Mathf.Sign(physics.TargetVelocity.x)), vWallJump.y));
           return;
         }
 
-        var grounded = physics.Grounded();
+        var grounded = physics.Grounded;
 
         // Handle jumping from ground
         if (grounded || canCoyoteJump) {
@@ -71,6 +67,16 @@ namespace DreamState {
         canCoyoteJump = false;
       }
 
+      protected override void Initialize() {
+        physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
+        wallStick = GetComponent<StickToWall>();
+        dash = GetComponent<Dash>();
+        if (wallStick != null) {
+          wallStick.OnStart(OnWallStickStart);
+          wallStick.OnStop(OnWallStickStop);
+        }
+      }
+
       private void OnGroundedChange(bool grounded) {
         if (grounded) {
           didDoubleJump = false;
@@ -79,12 +85,12 @@ namespace DreamState {
         }
       }
 
-      private void OnWallStickChange(bool stickingToWall) {
-        if (stickingToWall) {
-          didDoubleJump = false;
-        } else {
-          StartCoroutine(CoyoteJump());
-        }
+      private void OnWallStickStart() {
+        didDoubleJump = false;
+      }
+
+      private void OnWallStickStop() {
+        StartCoroutine(CoyoteJump());
       }
 
       private IEnumerator CoyoteJump() {
@@ -95,7 +101,7 @@ namespace DreamState {
 
       private IEnumerator HandleWallJumpAcceleration() {
         var initialAcceleration = physics.HorizontalAcceleration;
-        physics.HorizontalAcceleration = wallJumpAirAcceleration;
+        physics.HorizontalAcceleration = (dash != null && dash.HoldingDash) ? dashWallJumpAirAcceleration : wallJumpAirAcceleration;
 
         yield return new WaitForSeconds(wallJumpFloatTime);
 

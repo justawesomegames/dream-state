@@ -13,7 +13,6 @@ namespace DreamState {
     private float[] cooldowns;
     private int curAbilityIndex;
     private float curChargeTime;
-    private bool facingRight = true;
 
     public void OnAbilityDown() {
       if (cooldowns[curAbilityIndex] > 0) {

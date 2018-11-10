@@ -49,33 +49,25 @@ namespace DreamState {
         get { return horizontalAcceleration; }
         set { horizontalAcceleration = value; }
       }
+      public bool Grounded {
+        get { return GravityDirection() == -1 ? collisions.Bottom.IsColliding() : collisions.Top.IsColliding(); }
+      }
 
       private BoxCollisionInfo collisions;
       private BoxCollider2D boxCollider;
       private RaycastOrigins raycastOrigins;
       private float horizontalRaySpacing;
       private float verticalRaySpacing;
-      private SpriteRenderer spriteRenderer;
-      private bool facingRight = true;
       private Vector2 currentVelocity;
       private Vector2 targetVelocity;
       private List<Ability> abilities = new List<Ability>();
-      private IFaceable faceable;
 
       /// <summary>
       /// Move object at a speed
       /// </summary>
       /// <param name="moveAmount">Speed to move object</param>
-      /// <param name="instantX">Instantly set current x-velocity?</param>
-      /// <param name="instantY">Instantly set current y-velocity?</param>
-      public void Move(Vector2 moveAmount, bool instantX = false, bool instantY = false) {
+      public void Move(Vector2 moveAmount) {
         targetVelocity = moveAmount;
-        if (instantX) {
-          currentVelocity.x = moveAmount.x;
-        }
-        if (instantY) {
-          currentVelocity.y = moveAmount.y;
-        }
       }
 
       /// <summary>
@@ -117,14 +109,6 @@ namespace DreamState {
       }
 
       /// <summary>
-      /// Based on current gravity direction, check top or bottom collider for collision
-      /// </summary>
-      /// <returns>True if object is grounded, false otherwise</returns>
-      public bool Grounded() {
-        return GravityDirection() == -1 ? collisions.Bottom.IsColliding() : collisions.Top.IsColliding();
-      }
-
-      /// <summary>
       /// Get current gravity direction
       /// </summary>
       /// <returns>-1.0 for downwards, 1.0 for upwards</returns>
@@ -149,9 +133,7 @@ namespace DreamState {
       }
 
       private void Awake() {
-        spriteRenderer = GetComponent<SpriteRenderer>();
         boxCollider = GetComponent<BoxCollider2D>();
-        faceable = GetComponent<IFaceable>();
 
         var layerMask = collisionMask.value;
         if (layerMask == (layerMask | (1 << gameObject.layer))) {

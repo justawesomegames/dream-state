@@ -36,15 +36,15 @@ GameObject:
   - component: {fileID: 4561972165493298}
   - component: {fileID: 61823279785252152}
   - component: {fileID: 50175537036692076}
+  - component: {fileID: 212238826931822882}
+  - component: {fileID: 114465430045008744}
   - component: {fileID: 114211210019406146}
   - component: {fileID: 114152776325676804}
-  - component: {fileID: 212238826931822882}
   - component: {fileID: 114912900645149450}
   - component: {fileID: 114884661075294476}
   - component: {fileID: 114080754548249742}
-  - component: {fileID: 114465430045008744}
-  - component: {fileID: 114537237220536358}
   - component: {fileID: 114430848690352986}
+  - component: {fileID: 114269523007773420}
   m_Layer: 9
   m_Name: Dreamer
   m_TagString: Player
@@ -59,7 +59,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1778227753367288}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.0925603, y: 13.942037, z: 0}
+  m_LocalPosition: {x: 3.4667997, y: 14.179696, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4865601542845024}
@@ -171,6 +171,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 787e09ef6b873d04b8816e0c34cd9671, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114269523007773420
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1778227753367288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5905543531bbae4592b9287fe7e4c8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallSlideSpeed: -7
+  wallStickTimeBeforeSlide: 0.3
 --- !u!114 &114430848690352986
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -196,19 +209,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e14de9bdcba718b478005a2cc582eecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114537237220536358
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1778227753367288}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 542f460ad8c077846b07d0dabbf7f00f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wallSlideSpeed: -7
-  wallStickTimeBeforeSlide: 0.3
 --- !u!114 &114884661075294476
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -138,7 +138,7 @@ MonoBehaviour:
   jumpForce: 20
   doubleJumpForce: 15
   jumpTolerance: 0.2
-  canDoubleJump: 0
+  canDoubleJump: 1
   wallJump: {x: 15, y: 15}
   dashWallJump: {x: 20, y: 20}
   wallJumpAirAcceleration: 2
@@ -198,6 +198,7 @@ MonoBehaviour:
   dashSpeed: 20
   dashTime: 0.3
   dashCooldown: 0.3
+  canAirDash: 1
 --- !u!114 &114465430045008744
 MonoBehaviour:
   m_ObjectHideFlags: 1

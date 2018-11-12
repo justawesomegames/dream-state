@@ -15,6 +15,7 @@ namespace DreamState {
       [SerializeField] private float dashSpeed = 20f;
       [SerializeField] private float dashTime = 0.3f;
       [SerializeField] private float dashCooldown = 0.3f;
+      [SerializeField] private bool canAirDash;
 
       private HorizontalMovement horizontalMovement;
       private WallStick wallStick;
@@ -87,8 +88,11 @@ namespace DreamState {
           return;
         }
 
-        if (!physics.Grounded && didAirDash) {
-          return;
+        if (!physics.Grounded) {
+          if (!canAirDash || didAirDash) {
+            return;
+          }
+          horizontalMovement.SetSpeed(dashSpeed);
         }
 
         StartCoroutine(DashCooldown());

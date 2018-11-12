@@ -51,7 +51,7 @@ namespace DreamState {
       /// <summary>
       /// Called once per physics update to handle modifying physics and changing state
       /// </summary>
-      public virtual void Do() { }
+      public virtual void ProcessAbility() { }
 
       /// <summary>
       /// Called once when the ability is enabled
@@ -59,18 +59,18 @@ namespace DreamState {
       protected virtual void Initialize() { }
 
       protected void ChangeState(AbilityStates newState) {
-        if (state != newState) {
-          switch (newState) {
-            case AbilityStates.Doing:
-              if (state == AbilityStates.Stopped) {
-                onStartCallbacks.ForEach(c => c());
-              }
-              onDoingCallbacks.ForEach(c => c());
-              break;
-            case AbilityStates.Stopped:
-              onStopCallbacks.ForEach(c => c());
-              break;
-          }
+        if (state == newState) return;
+
+        switch (newState) {
+          case AbilityStates.Doing:
+            if (state == AbilityStates.Stopped) {
+              onStartCallbacks.ForEach(c => c());
+            }
+            onDoingCallbacks.ForEach(c => c());
+            break;
+          case AbilityStates.Stopped:
+            onStopCallbacks.ForEach(c => c());
+            break;
         }
         state = newState;
       }
@@ -87,10 +87,6 @@ namespace DreamState {
 
       private void OnDisable() {
         physics.RemoveAbility(this);
-      }
-
-      private void NotifySubscribers(bool state) {
-
       }
     }
   }

@@ -150,7 +150,7 @@ namespace DreamState {
         currentVelocity = CalculateNewVelocity();
 
         // Then account for any abilities this physical object may have
-        abilities.ForEach(a => a.Do());
+        abilities.ForEach(a => a.ProcessAbility());
 
         // Finally, actually move the object
         HandleNewMovement(currentVelocity * Time.deltaTime);

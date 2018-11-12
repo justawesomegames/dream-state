@@ -8,13 +8,13 @@ namespace DreamState {
     /// Handle sticking to a wall
     /// </summary>
     [DisallowMultipleComponent]
-    public class StickToWall : Ability {
+    public class WallStick : Ability {
       [SerializeField] private float wallSlideSpeed = -7f;
       [SerializeField] private float wallStickTimeBeforeSlide = 0.3f;
 
       private float wallStickTime = 0.0f;
 
-      public override void Do() {
+      public override void ProcessAbility() {
         var newWallStick = (physics.TargetVelocity.x < 0.0f && physics.Collisions.Left.IsColliding() ||
                             physics.TargetVelocity.x > 0.0f && physics.Collisions.Right.IsColliding()) &&
                             !physics.Grounded && physics.CurrentVelocity.y <= 0.0f;

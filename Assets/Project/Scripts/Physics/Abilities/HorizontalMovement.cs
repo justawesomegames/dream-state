@@ -12,9 +12,9 @@ namespace DreamState {
       private float curMoveScalar;
       private float curMoveSpeed;
       private Dash dash;
-      private StickToWall wallStick;
+      private WallStick wallStick;
 
-      public override void Do() {
+      public override void ProcessAbility() {
         if (dash != null && dash.Doing) {
           if (curMoveScalar == 0.0f ||
               dash.DashDir == FacingDir.Right && curMoveScalar > 0.0f ||
@@ -43,7 +43,7 @@ namespace DreamState {
       protected override void Initialize() {
         curMoveSpeed = moveSpeed;
         dash = GetComponent<Dash>();
-        wallStick = GetComponent<StickToWall>();
+        wallStick = GetComponent<WallStick>();
         physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
         if (wallStick != null) {
           wallStick.OnStart(OnWallStickStart);

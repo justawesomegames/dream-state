@@ -18,25 +18,44 @@ namespace DreamState {
       [SerializeField] private Vector2 wallJump = new Vector2(15f, 15f);
       [SerializeField] private Vector2 dashWallJump = new Vector2(20f, 20f);
       [Tooltip("Horizontal acceleration for <wallJumpFloatTime> after wall jump")]
-      [SerializeField]
-      private float wallJumpAirAcceleration = 2f;
+      [SerializeField] private float wallJumpAirAcceleration = 2f;
       [SerializeField] private float dashWallJumpAirAcceleration = 4f;
       [Tooltip("Amount of time to apply acceleration after wall jump before re-enabling previous horizontal acceleration")]
-      [SerializeField]
-      protected float wallJumpFloatTime = 0.2f;
+      [SerializeField] protected float wallJumpFloatTime = 0.2f;
 
-      private StickToWall wallStick;
+      private WallStick wallStick;
       private Dash dash;
+      private HorizontalMovement horizontalMovement;
+      private IFaceable faceable;
       private bool didDoubleJump;
       private bool canCoyoteJump;
+      private bool wasWallStickingLeft, wasWallStickingRight;
 
-      public override void Do() { }
+      public override void ProcessAbility() {
+        if (wasWallStickingLeft && physics.TargetVelocity.x > 0.0f) {
+          wasWallStickingLeft = false;
+        }
+        if (wasWallStickingRight && physics.TargetVelocity.x < 0.0f) {
+          wasWallStickingRight = false;
+        }
+      }
 
       public virtual void OnJumpPress() {
-        if (wallStick != null && wallStick.Doing) {
+        if (wasWallStickingLeft || wasWallStickingRight) {
           StartCoroutine(HandleWallJumpAcceleration());
-          Vector2 vWallJump = (dash != null && dash.HoldingDash) ? dashWallJump : wallJump;
-          physics.SetVelocity(new Vector2(-(vWallJump.x * Mathf.Sign(physics.TargetVelocity.x)), vWallJump.y));
+          Vector2 vWallJump = wallJump;
+          if (dash != null && dash.HoldingDash) {
+            vWallJump = dashWallJump;
+            if (horizontalMovement != null) {
+              horizontalMovement.SetSpeed(dash.DashSpeed);
+            }
+          }
+          var dir = Mathf.Sign(physics.TargetVelocity.x);
+          if (faceable != null) {
+            dir = faceable.CurFacingDir() == FacingDir.Right ? 1 : -1;
+          }
+          physics.SetVelocity(new Vector2(-(vWallJump.x * dir), vWallJump.y));
+          wasWallStickingLeft = wasWallStickingRight = false;
           return;
         }
 
@@ -69,11 +88,12 @@ namespace DreamState {
 
       protected override void Initialize() {
         physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
-        wallStick = GetComponent<StickToWall>();
+        wallStick = GetComponent<WallStick>();
         dash = GetComponent<Dash>();
+        horizontalMovement = GetComponent<HorizontalMovement>();
+        faceable = GetComponent<IFaceable>();
         if (wallStick != null) {
           wallStick.OnStart(OnWallStickStart);
-          wallStick.OnStop(OnWallStickStop);
         }
       }
 
@@ -87,10 +107,11 @@ namespace DreamState {
 
       private void OnWallStickStart() {
         didDoubleJump = false;
-      }
-
-      private void OnWallStickStop() {
-        StartCoroutine(CoyoteJump());
+        if (physics.Collisions.Left.IsColliding()) {
+          wasWallStickingLeft = true;
+        } else {
+          wasWallStickingRight = true;
+        }
       }
 
       private IEnumerator CoyoteJump() {

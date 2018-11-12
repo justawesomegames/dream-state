@@ -17,7 +17,7 @@ namespace DreamState {
       [SerializeField] private float dashCooldown = 0.3f;
 
       private HorizontalMovement horizontalMovement;
-      private StickToWall wallStick;
+      private WallStick wallStick;
       private IFaceable faceable;
       private bool inDashCooldown;
       private float curDashTime;
@@ -25,7 +25,7 @@ namespace DreamState {
       private bool holdingDash;
       private bool didAirDash;
 
-      public override void Do() {
+      public override void ProcessAbility() {
         if (!Doing) {
           return;
         }
@@ -69,11 +69,12 @@ namespace DreamState {
 
       protected override void Initialize() {
         horizontalMovement = GetComponent<HorizontalMovement>();
-        wallStick = GetComponent<StickToWall>();
+        wallStick = GetComponent<WallStick>();
         faceable = GetComponent<IFaceable>();
         physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
         if (wallStick != null) {
           wallStick.OnStart(OnWallStickStart);
+          wallStick.OnStop(OnWallStickStop);
         }
       }
 
@@ -82,7 +83,7 @@ namespace DreamState {
           return;
         }
 
-        if (wallStick.Doing) {
+        if (wallStick != null && wallStick.Doing) {
           return;
         }
 
@@ -111,6 +112,13 @@ namespace DreamState {
 
       private void OnWallStickStart() {
         StopDash();
+        didAirDash = false;
+      }
+
+      private void OnWallStickStop() {
+        if (holdingDash) {
+          didAirDash = true;
+        }
       }
 
       private IEnumerator DashCooldown() {

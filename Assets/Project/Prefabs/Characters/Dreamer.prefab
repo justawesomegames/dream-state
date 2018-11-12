@@ -36,11 +36,15 @@ GameObject:
   - component: {fileID: 4561972165493298}
   - component: {fileID: 61823279785252152}
   - component: {fileID: 50175537036692076}
-  - component: {fileID: 114129786370640692}
-  - component: {fileID: 114619582732366908}
   - component: {fileID: 114211210019406146}
   - component: {fileID: 114152776325676804}
   - component: {fileID: 212238826931822882}
+  - component: {fileID: 114912900645149450}
+  - component: {fileID: 114884661075294476}
+  - component: {fileID: 114080754548249742}
+  - component: {fileID: 114465430045008744}
+  - component: {fileID: 114537237220536358}
+  - component: {fileID: 114430848690352986}
   m_Layer: 9
   m_Name: Dreamer
   m_TagString: Player
@@ -55,7 +59,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1778227753367288}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -11.29, y: -1.66, z: 0}
+  m_LocalPosition: {x: 3.0925603, y: 13.942037, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4865601542845024}
@@ -120,7 +124,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &114129786370640692
+--- !u!114 &114080754548249742
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -128,20 +132,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1778227753367288}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0bc7cbb20ee0e734f810bd1052bb4d99, type: 3}
+  m_Script: {fileID: 11500000, guid: a0c3c8b4ff2a1d141b47a21cd3e0a557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravityModifier: 1
-  horizontalAcceleration: 3
-  terminalVelocity: 20
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 256
-  skinWidth: 0.05
-  distanceBetweenRays: 0.25
-  horizontalRayCount: 3
-  verticalRayCount: 3
-  maxSlopeAngleDegrees: 45
+  jumpForce: 20
+  doubleJumpForce: 15
+  jumpTolerance: 0.2
+  canDoubleJump: 0
+  wallJump: {x: 15, y: 15}
+  dashWallJump: {x: 20, y: 20}
+  wallJumpAirAcceleration: 2
+  dashWallJumpAirAcceleration: 4
+  wallJumpFloatTime: 0.2
 --- !u!114 &114152776325676804
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -169,7 +171,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 787e09ef6b873d04b8816e0c34cd9671, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114619582732366908
+--- !u!114 &114430848690352986
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1778227753367288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31d86c5f14ab2cb47921fc9716856724, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dashSpeed: 20
+  dashTime: 0.3
+  dashCooldown: 0.3
+--- !u!114 &114465430045008744
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -180,24 +196,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e14de9bdcba718b478005a2cc582eecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runSpeed: 10
-  dash:
-    dashVelocity: {x: 30, y: 0}
-    dashTime: 0.15
-    dashTimeout: 0.2
-  chargeDash:
-    dashVelocity: {x: 30, y: 0}
-    dashTime: 1
-  chargeDashTime: 2
-  jumpForce: 20
-  doubleJumpForce: 15
-  wallJump: {x: 20, y: 15}
-  canDoubleJump: 1
-  jumpTolerance: 0.1
-  wallJumpFloatTime: 0.2
-  wallStick:
-    wallSlideSpeed: 7
-    wallStickTimeBeforeSlide: 0.2
+--- !u!114 &114537237220536358
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1778227753367288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 542f460ad8c077846b07d0dabbf7f00f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallSlideSpeed: -7
+  wallStickTimeBeforeSlide: 0.3
+--- !u!114 &114884661075294476
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1778227753367288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587dfb0f9a34a9c43bc7fb735d16d0e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 10
+--- !u!114 &114912900645149450
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1778227753367288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5897524dd7baa41c68fceacefb7eb07f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gravityModifier: 1
+  horizontalAcceleration: 50
+  terminalVelocity: 20
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 256
+  skinWidth: 0.05
+  distanceBetweenRays: 0.25
+  horizontalRayCount: 3
+  verticalRayCount: 3
+  maxSlopeAngleDegrees: 45
 --- !u!212 &212238826931822882
 SpriteRenderer:
   m_ObjectHideFlags: 1

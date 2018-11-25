@@ -3,8 +3,10 @@ using DreamState.Physics;
 
 namespace DreamState {
   public abstract class Character : MonoBehaviour, IFaceable {
-    private FacingDir curFacingDir = FacingDir.Right;
-    private PlatformerPhysics physics;
+    [SerializeField] private FacingDir InitialFacingDir = FacingDir.Right;
+
+    protected FacingDir curFacingDir;
+    protected PlatformerPhysics physics;
 
     public bool IsFacing(FacingDir dir) {
       return curFacingDir == dir;
@@ -23,6 +25,7 @@ namespace DreamState {
 
     private void Awake() {
       physics = GetComponent<PlatformerPhysics>();
+      curFacingDir = InitialFacingDir;
     }
 
     private void Update() {

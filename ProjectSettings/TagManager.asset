@@ -17,8 +17,8 @@ TagManager:
   - Blocking
   - Character
   - Projectile
-  - 
-  - 
+  - Destructible_Blocking
+  - Destructible_Permissive
   - 
   - 
   - 

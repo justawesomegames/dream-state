@@ -21,8 +21,8 @@ namespace DreamState {
     public void Damage(float amt) {
       currentHealth -= amt;
       if (currentHealth <= 0) {
-        // TODO: Die
-        Debug.Log(String.Format("{0} has died!", gameObject.name));
+        // TODO: Death animation?
+        Destroy(gameObject);
       }
     }
 

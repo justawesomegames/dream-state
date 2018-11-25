@@ -75,8 +75,11 @@ namespace DreamState {
         state = newState;
       }
 
-      private void OnEnable() {
+      private void Awake() {
         physics = GetComponent<PlatformerPhysics>();
+      }
+
+      private void OnEnable() {
         physics.RegisterAbility(this);
         Initialize();
       }

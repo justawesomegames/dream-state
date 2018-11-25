@@ -8,6 +8,62 @@ namespace DreamState {
     private Jump jump;
     private Dash dash;
 
+    public void EnablePlayerInput() {
+      // Horizontal movement
+      if (horizontalMovement != null) {
+        InputManager.Instance.EnableEvent(InputContexts.Playing, InputAxes.Horizontal);
+      }
+
+      // Jumping
+      if (jump != null) {
+        InputManager.Instance.EnableEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Down);
+        InputManager.Instance.EnableEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Hold);
+        InputManager.Instance.EnableEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Up);
+      }
+
+      // Dashing
+      if (dash != null) {
+        InputManager.Instance.EnableEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Down);
+        InputManager.Instance.EnableEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Hold);
+        InputManager.Instance.EnableEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Up);
+      }
+
+      // Attacking
+      if (abilityManager != null) {
+        InputManager.Instance.EnableEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Down);
+        InputManager.Instance.EnableEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Hold);
+        InputManager.Instance.EnableEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Up);
+      }
+    }
+
+    public void DisablePlayerInput() {
+      // Horizontal movement
+      if (horizontalMovement != null) {
+        InputManager.Instance.DisableEvent(InputContexts.Playing, InputAxes.Horizontal);
+      }
+
+      // Jumping
+      if (jump != null) {
+        InputManager.Instance.DisableEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Down);
+        InputManager.Instance.DisableEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Hold);
+        InputManager.Instance.DisableEvent(InputContexts.Playing, InputButtons.Jump, InputButtonActions.Up);
+      }
+
+      // Dashing
+      if (dash != null) {
+        InputManager.Instance.DisableEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Down);
+        InputManager.Instance.DisableEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Hold);
+        InputManager.Instance.DisableEvent(InputContexts.Playing, InputButtons.Dash, InputButtonActions.Up);
+      }
+
+      // Attacking
+      if (abilityManager != null) {
+        InputManager.Instance.DisableEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Down);
+        InputManager.Instance.DisableEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Hold);
+        InputManager.Instance.DisableEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Up);
+      }
+    }
+
     private void Awake() {
       abilityManager = GetComponent<AbilityManager>();
       horizontalMovement = GetComponent<HorizontalMovement>();

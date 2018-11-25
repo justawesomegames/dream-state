@@ -93,7 +93,7 @@ namespace DreamState {
       /// </summary>
       /// <param name="newX">New x velocity</param>
       public void SetVelocityX(float newX) {
-        currentVelocity.x = newX;
+        targetVelocity.x = currentVelocity.x = newX;
       }
 
       /// <summary>
@@ -101,7 +101,7 @@ namespace DreamState {
       /// </summary>
       /// <param name="newY">New y velocity</param>
       public void SetVelocityY(float newY) {
-        currentVelocity.y = newY * -GravityDirection();
+        targetVelocity.y = currentVelocity.y = newY * -GravityDirection();
       }
 
       public void SetHorizontalAcceleration(float newAcceleration) {
@@ -150,7 +150,7 @@ namespace DreamState {
         currentVelocity = CalculateNewVelocity();
 
         // Then account for any abilities this physical object may have
-        abilities.ForEach(a => a.ProcessAbility());
+        abilities.ForEach(a => a.DoAbility());
 
         // Finally, actually move the object
         HandleNewMovement(currentVelocity * Time.deltaTime);

@@ -81,6 +81,8 @@ MonoBehaviour:
   level: 1
   maxHealth: 5
   maxResource: 100
+  currentHealth: 5
+  currentResource: 5
 --- !u!212 &212041671386430182
 SpriteRenderer:
   m_ObjectHideFlags: 1

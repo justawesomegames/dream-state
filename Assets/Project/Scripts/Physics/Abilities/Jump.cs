@@ -31,15 +31,6 @@ namespace DreamState {
       private bool canCoyoteJump;
       private bool wasWallStickingLeft, wasWallStickingRight;
 
-      public override void ProcessAbility() {
-        if (wasWallStickingLeft && physics.TargetVelocity.x > 0.0f) {
-          wasWallStickingLeft = false;
-        }
-        if (wasWallStickingRight && physics.TargetVelocity.x < 0.0f) {
-          wasWallStickingRight = false;
-        }
-      }
-
       public virtual void OnJumpPress() {
         if (wasWallStickingLeft || wasWallStickingRight) {
           StartCoroutine(HandleWallJumpAcceleration());
@@ -86,6 +77,15 @@ namespace DreamState {
         canCoyoteJump = false;
       }
 
+      protected override void ProcessAbility() {
+        if (wasWallStickingLeft && physics.TargetVelocity.x > 0.0f) {
+          wasWallStickingLeft = false;
+        }
+        if (wasWallStickingRight && physics.TargetVelocity.x < 0.0f) {
+          wasWallStickingRight = false;
+        }
+      }
+
       protected override void Initialize() {
         physics.Collisions.Bottom.RegisterCallback(OnGroundedChange);
         wallStick = GetComponent<WallStick>();
@@ -100,6 +100,7 @@ namespace DreamState {
       private void OnGroundedChange(bool grounded) {
         if (grounded) {
           didDoubleJump = false;
+          wasWallStickingLeft = wasWallStickingRight = false;
         } else {
           StartCoroutine(CoyoteJump());
         }

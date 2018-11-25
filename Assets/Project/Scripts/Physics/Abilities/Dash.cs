@@ -26,23 +26,6 @@ namespace DreamState {
       private bool holdingDash;
       private bool didAirDash;
 
-      public override void ProcessAbility() {
-        if (!Doing) {
-          return;
-        }
-
-        physics.SetVelocityX(dashSpeed * (dashDir == FacingDir.Right ? 1 : -1));
-        if (!physics.Grounded) {
-          didAirDash = true;
-          physics.SetVelocityY(0);
-        }
-
-        curDashTime += Time.deltaTime;
-        if (curDashTime > dashTime) {
-          StopDash();
-        }
-      }
-
       public void StartDash() {
         if (faceable == null) {
           Debug.LogWarning(string.Format("{0} does not have a facing direction, use DashInDirection", gameObject.name));
@@ -66,6 +49,23 @@ namespace DreamState {
 
       public void StopDash() {
         ChangeState(AbilityStates.Stopped);
+      }
+
+      protected override void ProcessAbility() {
+        if (!Doing) {
+          return;
+        }
+
+        physics.SetVelocityX(dashSpeed * (dashDir == FacingDir.Right ? 1 : -1));
+        if (!physics.Grounded) {
+          didAirDash = true;
+          physics.SetVelocityY(0);
+        }
+
+        curDashTime += Time.deltaTime;
+        if (curDashTime > dashTime) {
+          StopDash();
+        }
       }
 
       protected override void Initialize() {

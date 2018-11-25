@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 114080754548249742}
   - component: {fileID: 114430848690352986}
   - component: {fileID: 114269523007773420}
+  - component: {fileID: 114710645298542982}
   m_Layer: 9
   m_Name: Dreamer
   m_TagString: Player
@@ -210,6 +211,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e14de9bdcba718b478005a2cc582eecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  InitialFacingDir: 1
+--- !u!114 &114710645298542982
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1778227753367288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbae05196067c39499255acbab0f658f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 1
+  maxHealth: 100
+  maxResource: 100
+  currentHealth: 100
+  currentResource: 100
 --- !u!114 &114884661075294476
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -7,6 +7,7 @@ namespace DreamState {
 
     protected FacingDir curFacingDir;
     protected PlatformerPhysics physics;
+    protected CharacterStats stats;
 
     public bool IsFacing(FacingDir dir) {
       return curFacingDir == dir;
@@ -23,9 +24,27 @@ namespace DreamState {
       return curFacingDir;
     }
 
+    /// <summary>
+    /// Called when the character receives damage
+    /// </summary>
+    /// <param name="amt">Amount of damage taken</param>
+    public virtual void OnDamageTaken(float amt) { }
+
+    /// <summary>
+    /// Called after awake
+    /// </summary>
+    protected virtual void OnAwake() { }
+
+    /// <summary>
+    /// Called during each update frame
+    /// </summary>
+    protected virtual void OnUpdate() { }
+
     private void Awake() {
       physics = GetComponent<PlatformerPhysics>();
+      stats = GetComponent<CharacterStats>();
       curFacingDir = InitialFacingDir;
+      OnAwake();
     }
 
     private void Update() {
@@ -36,6 +55,8 @@ namespace DreamState {
           SetFacingDir(FacingDir.Right);
         }
       }
+
+      OnUpdate();
     }
   }
 }

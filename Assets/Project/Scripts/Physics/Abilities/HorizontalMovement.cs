@@ -14,19 +14,6 @@ namespace DreamState {
       private Dash dash;
       private WallStick wallStick;
 
-      public override void ProcessAbility() {
-        if (dash != null && dash.Doing) {
-          if (curMoveScalar == 0.0f ||
-              dash.DashDir == FacingDir.Right && curMoveScalar > 0.0f ||
-              dash.DashDir == FacingDir.Left && curMoveScalar < 0.0f) {
-            return;
-          }
-          dash.StopDash();
-        }
-
-        physics.Move(Vector2.right * curMoveSpeed * curMoveScalar);
-      }
-
       public void Move(float moveScalar) {
         if (moveScalar != 0.0f && curMoveScalar == 0.0f) {
           ChangeState(AbilityStates.Doing);
@@ -40,6 +27,19 @@ namespace DreamState {
         curMoveSpeed = moveSpeed;
       }
 
+      protected override void ProcessAbility() {
+        if (dash != null && dash.Doing) {
+          if (curMoveScalar == 0.0f ||
+              dash.DashDir == FacingDir.Right && curMoveScalar > 0.0f ||
+              dash.DashDir == FacingDir.Left && curMoveScalar < 0.0f) {
+            return;
+          }
+          dash.StopDash();
+        }
+
+        physics.Move(Vector2.right * curMoveSpeed * curMoveScalar);
+      }
+
       protected override void Initialize() {
         curMoveSpeed = moveSpeed;
         dash = GetComponent<Dash>();
@@ -48,6 +48,10 @@ namespace DreamState {
         if (wallStick != null) {
           wallStick.OnStart(OnWallStickStart);
         }
+      }
+
+      protected override void OnOverrideEnable() {
+        curMoveScalar = 0.0f;
       }
 
       private void OnGroundedChange(bool grounded) {

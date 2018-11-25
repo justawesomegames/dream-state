@@ -25,6 +25,8 @@ GameObject:
   - component: {fileID: 114302224912461842}
   - component: {fileID: 114164566784520460}
   - component: {fileID: 114770015328662844}
+  - component: {fileID: 114394838090580416}
+  - component: {fileID: 114140130945206822}
   m_Layer: 9
   m_Name: BasicPatrol
   m_TagString: Enemy
@@ -90,6 +92,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1.03}
   m_EdgeRadius: 0
+--- !u!114 &114140130945206822
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1974671507023534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbae05196067c39499255acbab0f658f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 1
+  maxHealth: 5
+  maxResource: 0
+  currentHealth: 5
+  currentResource: 0
 --- !u!114 &114164566784520460
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -102,7 +120,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InitialFacingDir: 1
-  ChangeDirOnHorizontalCollision: 1
+  changeDirOnHorizontalCollision: 1
 --- !u!114 &114302224912461842
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -125,6 +143,20 @@ MonoBehaviour:
   horizontalRayCount: 6
   verticalRayCount: 4
   maxSlopeAngleDegrees: 45
+--- !u!114 &114394838090580416
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1974671507023534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cb70da55518c0c449deb3d0281e4cfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 1
+  damagesWhichTags:
+  - Player
 --- !u!114 &114770015328662844
 MonoBehaviour:
   m_ObjectHideFlags: 1

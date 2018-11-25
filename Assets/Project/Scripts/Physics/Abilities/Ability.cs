@@ -16,6 +16,7 @@ namespace DreamState {
     [RequireComponent(typeof(PlatformerPhysics))]
     public abstract class Ability : MonoBehaviour {
       public bool Doing { get { return state == AbilityStates.Doing; } }
+      [SerializeField] private bool isOverridden = false;
 
       protected PlatformerPhysics physics;
 
@@ -51,12 +52,43 @@ namespace DreamState {
       /// <summary>
       /// Called once per physics update to handle modifying physics and changing state
       /// </summary>
-      public virtual void ProcessAbility() { }
+      public void DoAbility() {
+        if (isOverridden) return;
+        ProcessAbility();
+      }
+
+      /// <summary>
+      /// Override the ability, immediately stopping usage
+      /// </summary>
+      /// <param name="o">Enable or disable override</param>
+      public void Override(bool enabled) {
+        if (enabled) {
+          OnOverrideEnable();
+        } else {
+          OnOverrideDisable();
+        }
+        isOverridden = enabled;
+      }
+
+      /// <summary>
+      /// Called once per physics update unless ability is overridden
+      /// </summary>
+      protected virtual void ProcessAbility() { }
 
       /// <summary>
       /// Called once when the ability is enabled
       /// </summary>
       protected virtual void Initialize() { }
+
+      /// <summary>
+      /// Called when ability is overridden
+      /// </summary>
+      protected virtual void OnOverrideEnable() { }
+
+      /// <summary>
+      /// Called when ability override is removed
+      /// </summary>
+      protected virtual void OnOverrideDisable() { }
 
       protected void ChangeState(AbilityStates newState) {
         if (state == newState) return;

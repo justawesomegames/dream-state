@@ -6,10 +6,11 @@ namespace DreamState {
   [RequireComponent(typeof(TextMesh))]
   public class DamageText : PoolableObject {
     [SerializeField] private float lifetime = 1.0f;
-    [SerializeField] private Vector2 initialVelocity = new Vector2(2, 2);
+    [SerializeField] private List<Vector2> initialVelocities = new List<Vector2>();
     [SerializeField] private Vector2 targetVelocity = new Vector2(0, -2);
 
     private TextMesh textMesh;
+    private Vector2 initialVelocity;
     private Vector2 currentVelocity;
 
     public void SetText(float amt) {
@@ -17,8 +18,9 @@ namespace DreamState {
     }
 
     public override void OnSpawn() {
+      initialVelocity = initialVelocities[Random.Range(0, initialVelocities.Count)];
       currentVelocity = initialVelocity;
-      currentVelocity.x *= Random.Range(0.0f, 1.0f) > 0.5f ? -1 : 1;
+      currentVelocity.x *= Random.Range(0, 10) > 4 ? -1 : 1;
       StartCoroutine(Fade());
       StartCoroutine(Move());
     }

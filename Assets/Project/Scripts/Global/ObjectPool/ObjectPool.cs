@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace DreamState {
-  public class ObjectPool {
+  public class ObjectPool : MonoBehaviour {
     private PoolableObject objectToPool;
     private int poolSize;
 
     private List<PoolableObject> pool;
 
-    public ObjectPool(PoolableObject objectToPool, int poolSize) {
+    public void Initialize(PoolableObject objectToPool, int poolSize) {
       this.objectToPool = objectToPool;
       this.poolSize = poolSize;
 
@@ -36,6 +36,7 @@ namespace DreamState {
       foreach (var g in pool) {
         if (g == objectToDeactivate) {
           g.gameObject.SetActive(false);
+          g.gameObject.transform.SetParent(transform);
           return;
         }
       }
@@ -53,7 +54,7 @@ namespace DreamState {
       var obj = GameObject.Instantiate(objectToPool);
       obj.name = objectToPool.name;
       obj.gameObject.SetActive(false);
-      // obj.transform.SetParent(transform);
+      obj.gameObject.transform.SetParent(transform);
       return obj;
     }
   }

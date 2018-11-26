@@ -488,6 +488,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2004e31b09135f84b8e0906a968c2cf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objectPoolPrefab: {fileID: 114364076935083416, guid: 208b60e70ee3882478ce525fae225162,
+    type: 2}
   defaultPoolSize: 5
   initialPools:
   - Object: {fileID: 114053221249307126, guid: 9c4e0f089e6abac49896d73580bf7526, type: 2}
@@ -510,7 +512,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifetime: 1
-  initialVelocity: {x: 2, y: 2}
+  initialVelocities:
+  - {x: 2, y: 2}
+  - {x: -2, y: 2}
+  - {x: 1, y: 1}
+  - {x: -1, y: 1}
   targetVelocity: {x: 0, y: -5}
 --- !u!114 &114994099398660076
 MonoBehaviour:

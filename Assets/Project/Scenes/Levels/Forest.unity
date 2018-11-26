@@ -264,11 +264,6 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 1924283408}
     m_Modifications:
-    - target: {fileID: 114152776325676804, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: damagesWhichTags.Array.size
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4561972165493298, guid: 47c864d037cb14a91b912e7c3f68187c, type: 2}
       propertyPath: m_LocalPosition.x
       value: 47.77
@@ -301,69 +296,7 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 114430848690352986, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114269523007773420, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114080754548249742, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: canDoubleJump
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114884661075294476, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: moveSpeed
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 114152776325676804, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: damagesWhichTags.Array.data[1]
-      value: Destructible_Blocking
-      objectReference: {fileID: 0}
-    - target: {fileID: 114912900645149450, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: collisionMask.m_Bits
-      value: 2304
-      objectReference: {fileID: 0}
-    - target: {fileID: 114152776325676804, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114465430045008744, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: invulnerableAfterDamageTime
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 114465430045008744, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: recoveryAfterDamageTime
-      value: 0.7
-      objectReference: {fileID: 0}
-    - target: {fileID: 114465430045008744, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: damageImpulse.y
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 114465430045008744, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: damageImpulse.x
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 114662139946789556, guid: 47c864d037cb14a91b912e7c3f68187c,
-        type: 2}
-      propertyPath: m_ImpulseDefinition.m_Randomize
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 114269523007773420, guid: 47c864d037cb14a91b912e7c3f68187c, type: 2}
-    - {fileID: 114430848690352986, guid: 47c864d037cb14a91b912e7c3f68187c, type: 2}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 47c864d037cb14a91b912e7c3f68187c, type: 2}
   m_IsPrefabAsset: 0
 --- !u!1 &765495399

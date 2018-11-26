@@ -12,10 +12,12 @@ namespace DreamState {
   }
 
   public class ObjectPoolManager : Singleton<ObjectPoolManager> {
+    [SerializeField] private ObjectPool objectPoolPrefab;
     [SerializeField] private int defaultPoolSize = 5;
     [SerializeField] private List<ObjectPoolBootstrap> initialPools = new List<ObjectPoolBootstrap>();
 
     private Dictionary<string, ObjectPool> objectPools = new Dictionary<string, ObjectPool>();
+    private GameObject poolParent;
 
     public PoolableObject Spawn(PoolableObject g, Transform parent, Vector3 position, Quaternion rotation) {
       var ret = GetPoolFor(g).Next();
@@ -39,6 +41,7 @@ namespace DreamState {
     }
 
     private void Start() {
+      poolParent = new GameObject("ObjectPools");
       foreach (var pool in initialPools) {
         AddPool(pool.Object, pool.Size);
       }
@@ -59,7 +62,9 @@ namespace DreamState {
         return pool;
       }
 
-      pool = new ObjectPool(g, size);
+      pool = Instantiate<ObjectPool>(objectPoolPrefab, poolParent.transform);
+      pool.name = string.Format("{0}Pool", g.name);
+      pool.Initialize(g, size);
       objectPools.Add(g.name, pool);
       return pool;
     }

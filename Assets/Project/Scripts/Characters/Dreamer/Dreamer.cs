@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using DreamState.Physics;
+using Cinemachine;
 
 namespace DreamState {
   [RequireComponent(typeof(PlayerInputController))]
@@ -10,9 +11,9 @@ namespace DreamState {
     [SerializeField] private float recoveryAfterDamageTime = 0.5f;
     [SerializeField] private Vector2 damageImpulse = new Vector2(2f, 5f);
 
-    PlayerInputController inputController;
-    HorizontalMovement horizontalMovement;
-    SpriteFlash spriteFlash;
+    private PlayerInputController inputController;
+    private HorizontalMovement horizontalMovement;
+    private SpriteFlash spriteFlash;
 
     public override void OnDamageTaken(float amt) {
       horizontalMovement.Override(true);

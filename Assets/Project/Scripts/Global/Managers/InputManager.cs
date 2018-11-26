@@ -50,7 +50,7 @@ namespace DreamState {
     public IEnumerable<InputButtons> buttons;
     public IEnumerable<InputAxes> axes;
 
-    public InputManager() {
+    private void Awake() {
       InitializeContexts();
       InitializeInputs();
     }

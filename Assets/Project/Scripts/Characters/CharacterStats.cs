@@ -31,6 +31,8 @@ namespace DreamState {
       }
 
       currentHealth -= amt;
+      FloatingTextManager.Instance.Damage(gameObject, amt);
+
       if (currentHealth <= 0) {
         // TODO: Death animation?
         Destroy(gameObject);

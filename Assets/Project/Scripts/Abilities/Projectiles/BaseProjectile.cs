@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DreamState {
   [RequireComponent(typeof(Rigidbody2D))]
-  public abstract class BaseProjectile : MonoBehaviour {
+  public abstract class BaseProjectile : PoolableObject {
     [SerializeField] protected Vector2 velocity = Vector2.right;
     [SerializeField] protected LayerMask destroysOnWhat;
 
@@ -31,7 +31,7 @@ namespace DreamState {
     }
 
     public virtual void AfterInitialize() {
-      if (!facingRight) {
+      if (facingRight && velocity.x < 0 || !facingRight && velocity.x > 0) {
         velocity.x *= -1;
       }
     }
@@ -39,6 +39,10 @@ namespace DreamState {
     public virtual void Step() {
       transform.Translate(velocity * Time.deltaTime);
     }
+
+    public override void OnSpawn() { }
+
+    public override void OnDespawn() { }
 
     private void Awake() {
       spriteRenderer = GetComponent<SpriteRenderer>();
@@ -75,8 +79,7 @@ namespace DreamState {
     }
 
     private void DestroyProjectile() {
-      // TODO: Object pooling
-      Destroy(gameObject);
+      ObjectPoolManager.Instance.Despawn(this);
     }
   }
 }

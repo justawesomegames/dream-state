@@ -43,6 +43,7 @@ namespace DreamState {
     private void Awake() {
       physics = GetComponent<PlatformerPhysics>();
       stats = GetComponent<CharacterStats>();
+      stats.OnDamageTaken += OnDamageTaken;
       curFacingDir = InitialFacingDir;
       OnAwake();
     }

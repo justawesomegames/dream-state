@@ -5,13 +5,11 @@ using UnityEngine;
 namespace DreamState {
   public class ObjectPool : MonoBehaviour {
     private PoolableObject objectToPool;
-    private int poolSize;
 
     private List<PoolableObject> pool;
 
     public void Initialize(PoolableObject objectToPool, int poolSize) {
       this.objectToPool = objectToPool;
-      this.poolSize = poolSize;
 
       pool = new List<PoolableObject>(poolSize);
       for (int i = 0; i < poolSize; i++) {

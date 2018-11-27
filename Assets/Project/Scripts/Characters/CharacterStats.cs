@@ -10,7 +10,8 @@ namespace DreamState {
     [SerializeField] private float currentResource = 100;
     [SerializeField] private bool invulnerable = false;
 
-    private Character character;
+    public event Action<float> OnDamageTaken = delegate { };
+    public event Action<float, float> OnHealthChange = delegate { };
 
     public bool CanExpendResource(float amt) {
       return currentResource > amt;
@@ -32,14 +33,13 @@ namespace DreamState {
 
       currentHealth -= amt;
       FloatingTextManager.Instance.Damage(gameObject, amt);
+      OnDamageTaken(amt);
+      OnHealthChange(currentHealth, maxHealth);
 
       if (currentHealth <= 0) {
         // TODO: Death animation?
         Destroy(gameObject);
-      }
-
-      if (character != null) {
-        character.OnDamageTaken(amt);
+        return true;
       }
 
       return true;
@@ -47,10 +47,6 @@ namespace DreamState {
 
     public void SetInvulnerable(bool i) {
       invulnerable = i;
-    }
-
-    private void Awake() {
-      character = GetComponent<Character>();
     }
   }
 }

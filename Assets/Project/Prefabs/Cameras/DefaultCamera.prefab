@@ -53,6 +53,7 @@ GameObject:
   - component: {fileID: 4350833159032944}
   - component: {fileID: 114746490690685590}
   - component: {fileID: 114712058245449768}
+  - component: {fileID: 114076384667185030}
   m_Layer: 0
   m_Name: cm
   m_TagString: Untagged
@@ -70,7 +71,6 @@ GameObject:
   - component: {fileID: 4943072143398452}
   - component: {fileID: 114299840452660860}
   - component: {fileID: 114533033607229856}
-  - component: {fileID: 114860950352696662}
   m_Layer: 0
   m_Name: VirtualCamera
   m_TagString: Untagged
@@ -161,6 +161,21 @@ PolygonCollider2D:
       - {x: -46.114723, y: -0.59013796}
       - {x: 30.42836, y: -0.73605824}
       - {x: 30.35387, y: 19.716331}
+--- !u!114 &114076384667185030
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1557100008302678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68bb026fafb42b14791938953eaace77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
+  m_AmplitudeGain: 0
+  m_FrequencyGain: 1
+  mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!114 &114299840452660860
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -276,17 +291,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac0b09e7857660247b1477e93731de29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114860950352696662
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1867729841997368}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00b2d199b96b516448144ab30fb26aed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ChannelMask: 1
-  m_Gain: 1
-  m_Use2DDistance: 1

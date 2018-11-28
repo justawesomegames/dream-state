@@ -22,6 +22,7 @@ namespace DreamState {
       newV.x *= curFacingDir == FacingDir.Right ? -1 : 1;
       physics.SetVelocity(newV);
       spriteFlash.StartFlash(invulnerableAfterDamageTime);
+      Camera.main.SimpleShakeCurrentVCam(0.25f, 2, 1);
 
       StartCoroutine(TriggerInvulnerability());
       StartCoroutine(TriggerRecovery());

@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 114694863074512314}
   - component: {fileID: 114527927768736382}
   - component: {fileID: 114743960334832276}
+  - component: {fileID: 114158721136444624}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -37,12 +38,25 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1281261274513206}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 44.938255, y: 1.4244771, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114158721136444624
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1281261274513206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2a9cd246f2859d45aa54d4c2b070673, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floatingHealthBar: {fileID: 114019936912245160, guid: 5b9cc6d6323f1e941ac5a3bcbdc87098,
+    type: 2}
 --- !u!114 &114413702412568124
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -100,4 +114,6 @@ MonoBehaviour:
   - Object: {fileID: 114543609399349402, guid: b0e55e372f422a04c84c76732c15f3f5, type: 2}
     Size: 10
   - Object: {fileID: 114616205795538134, guid: 56e017e2f1b4e844fac1f4367168db4f, type: 2}
+    Size: 10
+  - Object: {fileID: 114019936912245160, guid: 5b9cc6d6323f1e941ac5a3bcbdc87098, type: 2}
     Size: 10

@@ -4,22 +4,58 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace DreamState {
-  public class FloatingHealthBar : MonoBehaviour {
+  [RequireComponent(typeof(CanvasGroup))]
+  public class FloatingHealthBar : PoolableObject {
     [SerializeField] private Image foreground;
+    [SerializeField] private float timeToStartFade = 1.0f;
+    [SerializeField] private float timeToFade = 0.5f;
 
-    private CharacterStats stats;
+    private CanvasGroup canvasGroup;
+    private Transform anchor;
+    private Coroutine currentFade;
+
+    public override void OnSpawn() {
+      canvasGroup.alpha = 0.0f;
+    }
+
+    public override void OnDespawn() {
+      canvasGroup.alpha = 0.0f;
+    }
+
+    public void Initialize(CharacterStats stats, Transform anchor) {
+      stats.OnHealthChange += OnHealthChange;
+      stats.OnDeath += OnDeath;
+      this.anchor = anchor;
+    }
 
     private void Awake() {
-      stats = GetComponentInParent<CharacterStats>();
-      if (stats == null) {
-        Debug.LogError("Health bar present without associated CharacterStats.");
-        return;
-      }
-      stats.OnHealthChange += OnHealthChange;
+      canvasGroup = GetComponentInParent<CanvasGroup>();
+    }
+
+    private void LateUpdate() {
+      transform.position = anchor.position;
     }
 
     private void OnHealthChange(float currentHealth, float maxHealth) {
-      foreground.fillAmount = Mathf.Clamp(currentHealth / maxHealth, 0, maxHealth);
+      var newHealthPercent = Mathf.Clamp(currentHealth / maxHealth, 0, maxHealth);
+      foreground.fillAmount = newHealthPercent;
+      if (currentFade != null) {
+        StopCoroutine(currentFade);
+      }
+      currentFade = StartCoroutine(WaitThenFade());
+    }
+
+    private void OnDeath() {
+      ObjectPoolManager.Instance.Despawn(this);
+    }
+
+    private IEnumerator WaitThenFade() {
+      canvasGroup.alpha = 1.0f;
+      yield return new WaitForSeconds(timeToStartFade);
+      for (var t = 0.0f; t < 1.0f; t += Time.deltaTime / timeToFade) {
+        canvasGroup.alpha = Mathf.Lerp(1.0f, 0.0f, t);
+        yield return null;
+      }
     }
   }
 }

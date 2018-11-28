@@ -9,9 +9,13 @@ namespace DreamState {
     [SerializeField] private float currentHealth = 100;
     [SerializeField] private float currentResource = 100;
     [SerializeField] private bool invulnerable = false;
+    [SerializeField] private Transform floatingTextSpawn;
+    [SerializeField] private bool hasFloatingHealthBar = true;
+    [SerializeField] private Transform healthbarAnchor;
 
     public event Action<float> OnDamageTaken = delegate { };
     public event Action<float, float> OnHealthChange = delegate { };
+    public event Action OnDeath = delegate { };
 
     public bool CanExpendResource(float amt) {
       return currentResource > amt;
@@ -32,12 +36,13 @@ namespace DreamState {
       }
 
       currentHealth -= amt;
-      FloatingTextManager.Instance.Damage(gameObject, amt);
+      FloatingTextManager.Instance.Damage(floatingTextSpawn != null ? floatingTextSpawn.position : transform.position, amt);
       OnDamageTaken(amt);
       OnHealthChange(currentHealth, maxHealth);
 
       if (currentHealth <= 0) {
         // TODO: Death animation?
+        OnDeath();
         Destroy(gameObject);
         return true;
       }
@@ -47,6 +52,12 @@ namespace DreamState {
 
     public void SetInvulnerable(bool i) {
       invulnerable = i;
+    }
+
+    private void Start() {
+      if (hasFloatingHealthBar) {
+        HealthbarManager.Instance.AttachFloatingHealthbar(this, healthbarAnchor);
+      }
     }
   }
 }

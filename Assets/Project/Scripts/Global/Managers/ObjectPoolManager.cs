@@ -19,14 +19,14 @@ namespace DreamState {
     private Dictionary<string, ObjectPool> objectPools = new Dictionary<string, ObjectPool>();
     private GameObject poolParent;
 
-    public PoolableObject Spawn(PoolableObject g, Transform parent, Vector3 position, Quaternion rotation) {
+    public T Spawn<T>(T g, Transform parent, Vector3 position, Quaternion rotation) where T : PoolableObject {
       var ret = GetPoolFor(g).Next();
-      ret.transform.parent = parent;
+      ret.transform.SetParent(parent);
       ret.transform.position = position;
       ret.transform.rotation = rotation;
       ret.gameObject.SetActive(true);
       ret.OnSpawn();
-      return ret;
+      return ret as T;
     }
 
     public void Despawn(PoolableObject g) {
@@ -40,7 +40,7 @@ namespace DreamState {
       g.OnDespawn();
     }
 
-    private void Start() {
+    private void Awake() {
       poolParent = new GameObject("ObjectPools");
       foreach (var pool in initialPools) {
         AddPool(pool.Object, pool.Size);

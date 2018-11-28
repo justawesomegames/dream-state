@@ -44,15 +44,15 @@ namespace DreamState {
       physics = GetComponent<PlatformerPhysics>();
       stats = GetComponent<CharacterStats>();
       stats.OnDamageTaken += OnDamageTaken;
-      curFacingDir = InitialFacingDir;
+      SetFacingDir(InitialFacingDir);
       OnAwake();
     }
 
     private void Update() {
       if (physics != null) {
-        if (physics.TargetVelocity.x < 0.0f && curFacingDir == FacingDir.Right) {
+        if (physics.TargetVelocity.x < 0.0f && curFacingDir != FacingDir.Left) {
           SetFacingDir(FacingDir.Left);
-        } else if (physics.TargetVelocity.x > 0.0f && curFacingDir == FacingDir.Left) {
+        } else if (physics.TargetVelocity.x > 0.0f && curFacingDir != FacingDir.Right) {
           SetFacingDir(FacingDir.Right);
         }
       }

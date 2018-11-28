@@ -233,6 +233,9 @@ MonoBehaviour:
   currentHealth: 100
   currentResource: 100
   invulnerable: 0
+  floatingTextSpawn: {fileID: 0}
+  hasFloatingHealthBar: 0
+  healthbarAnchor: {fileID: 0}
 --- !u!114 &114884661075294476
 MonoBehaviour:
   m_ObjectHideFlags: 1

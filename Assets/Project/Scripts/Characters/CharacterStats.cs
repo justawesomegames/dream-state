@@ -6,9 +6,16 @@ namespace DreamState {
     [SerializeField] private int level = 1;
     [SerializeField] private float maxHealth = 100;
     [SerializeField] private float maxResource = 100;
+    [SerializeField] private float currentHealth = 100;
+    [SerializeField] private float currentResource = 100;
+    [SerializeField] private bool invulnerable = false;
+    [SerializeField] private Transform floatingTextSpawn;
+    [SerializeField] private bool hasFloatingHealthBar = true;
+    [SerializeField] private Transform healthbarAnchor;
 
-    private float currentHealth;
-    private float currentResource;
+    public event Action<float> OnDamageTaken = delegate { };
+    public event Action<float, float> OnHealthChange = delegate { };
+    public event Action OnDeath = delegate { };
 
     public bool CanExpendResource(float amt) {
       return currentResource > amt;
@@ -18,17 +25,39 @@ namespace DreamState {
       currentResource -= amt;
     }
 
-    public void Damage(float amt) {
-      currentHealth -= amt;
-      if (currentHealth <= 0) {
-        // TODO: Die
-        Debug.Log(String.Format("{0} has died!", gameObject.name));
+    /// <summary>
+    /// Inflict damage on this object
+    /// </summary>
+    /// <param name="amt">Amount of damage to inflict</param>
+    /// <returns>True if damage successfully inflicted, false otherwise</returns>
+    public bool Damage(float amt) {
+      if (invulnerable) {
+        return false;
       }
+
+      currentHealth -= amt;
+      FloatingTextManager.Instance.Damage(floatingTextSpawn != null ? floatingTextSpawn.position : transform.position, amt);
+      OnDamageTaken(amt);
+      OnHealthChange(currentHealth, maxHealth);
+
+      if (currentHealth <= 0) {
+        // TODO: Death animation?
+        OnDeath();
+        Destroy(gameObject);
+        return true;
+      }
+
+      return true;
     }
 
-    private void Awake() {
-      currentHealth = maxHealth;
-      currentResource = maxResource;
+    public void SetInvulnerable(bool i) {
+      invulnerable = i;
+    }
+
+    private void Start() {
+      if (hasFloatingHealthBar) {
+        HealthbarManager.Instance.AttachFloatingHealthbar(this, healthbarAnchor);
+      }
     }
   }
 }

@@ -26,6 +26,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1584706346514912
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4315864006840968}
+  m_Layer: 9
+  m_Name: FloatingTextSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1778227753367288
 GameObject:
   m_ObjectHideFlags: 0
@@ -43,8 +58,8 @@ GameObject:
   - component: {fileID: 114912900645149450}
   - component: {fileID: 114884661075294476}
   - component: {fileID: 114080754548249742}
-  - component: {fileID: 114430848690352986}
-  - component: {fileID: 114269523007773420}
+  - component: {fileID: 114710645298542982}
+  - component: {fileID: 114888316047853706}
   m_Layer: 9
   m_Name: Dreamer
   m_TagString: Player
@@ -52,6 +67,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!4 &4315864006840968
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1584706346514912}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4561972165493298}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4561972165493298
 Transform:
   m_ObjectHideFlags: 1
@@ -59,10 +87,11 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1778227753367288}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.4667997, y: 14.179696, z: 0}
+  m_LocalPosition: {x: 47.77, y: 6.08, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4865601542845024}
+  - {fileID: 4315864006840968}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -135,10 +164,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0c3c8b4ff2a1d141b47a21cd3e0a557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isOverridden: 0
   jumpForce: 20
   doubleJumpForce: 15
   jumpTolerance: 0.2
-  canDoubleJump: 1
+  canDoubleJump: 0
   wallJump: {x: 15, y: 15}
   dashWallJump: {x: 20, y: 20}
   wallJumpAirAcceleration: 2
@@ -156,7 +186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   abilities:
-  - {fileID: 11400000, guid: ec3d954171d5d8c4986cc7586c2b928b, type: 2}
+  - {fileID: 114904491069170510, guid: 0a4cf5eb4ed2fb74e8e1b148b1e2d35f, type: 2}
   rangeAbilitySpawnPoint: {fileID: 4865601542845024}
   damagesWhichTags:
   - Enemy
@@ -171,34 +201,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 787e09ef6b873d04b8816e0c34cd9671, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114269523007773420
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1778227753367288}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5905543531bbae4592b9287fe7e4c8c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wallSlideSpeed: -7
-  wallStickTimeBeforeSlide: 0.3
---- !u!114 &114430848690352986
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1778227753367288}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31d86c5f14ab2cb47921fc9716856724, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dashSpeed: 20
-  dashTime: 0.3
-  dashCooldown: 0.3
-  canAirDash: 1
 --- !u!114 &114465430045008744
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -210,6 +212,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e14de9bdcba718b478005a2cc582eecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  InitialFacingDir: 1
+  invulnerableAfterDamageTime: 2
+  recoveryAfterDamageTime: 0.7
+  damageImpulse: {x: 3, y: 3}
+--- !u!114 &114710645298542982
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1778227753367288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbae05196067c39499255acbab0f658f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 1
+  maxHealth: 100
+  maxResource: 100
+  currentHealth: 100
+  currentResource: 100
+  invulnerable: 0
+  floatingTextSpawn: {fileID: 0}
+  hasFloatingHealthBar: 0
+  healthbarAnchor: {fileID: 0}
 --- !u!114 &114884661075294476
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -221,7 +247,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 587dfb0f9a34a9c43bc7fb735d16d0e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
+  isOverridden: 0
+  moveSpeed: 8
+--- !u!114 &114888316047853706
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1778227753367288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f34f60f6789ced46b79b231575bad09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {r: 1, g: 0, b: 0, a: 1}
+  period: 0.05
 --- !u!114 &114912900645149450
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -238,7 +278,7 @@ MonoBehaviour:
   terminalVelocity: 20
   collisionMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 2304
   skinWidth: 0.05
   distanceBetweenRays: 0.25
   horizontalRayCount: 3

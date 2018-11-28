@@ -16,20 +16,21 @@ namespace DreamState {
     [RequireComponent(typeof(PlatformerPhysics))]
     public abstract class Ability : MonoBehaviour {
       public bool Doing { get { return state == AbilityStates.Doing; } }
+      [SerializeField] private bool isOverridden = false;
 
       protected PlatformerPhysics physics;
 
       private AbilityStates state = AbilityStates.Stopped;
-      private List<Action> onStartCallbacks = new List<Action>();
-      private List<Action> onDoingCallbacks = new List<Action>();
-      private List<Action> onStopCallbacks = new List<Action>();
+      private event Action onStartCallbacks = delegate { };
+      private event Action onDoingCallbacks = delegate { };
+      private event Action onStopCallbacks = delegate { };
 
       /// <summary>
       /// Provide callback for when an ability starts
       /// </summary>
       /// <param name="callback">Function to invoke when ability starts</param>
       public void OnStart(Action callback) {
-        onStartCallbacks.Add(callback);
+        onStartCallbacks += callback;
       }
 
       /// <summary>
@@ -37,7 +38,7 @@ namespace DreamState {
       /// </summary>
       /// <param name="callback">Function to invoke while ability is happening</param>
       public void WhileDoing(Action callback) {
-        onDoingCallbacks.Add(callback);
+        onDoingCallbacks += callback;
       }
 
       /// <summary>
@@ -45,18 +46,49 @@ namespace DreamState {
       /// </summary>
       /// <param name="callback">Function to invoke when ability stops</param>
       public void OnStop(Action callback) {
-        onStopCallbacks.Add(callback);
+        onStopCallbacks += callback;
       }
 
       /// <summary>
       /// Called once per physics update to handle modifying physics and changing state
       /// </summary>
-      public virtual void ProcessAbility() { }
+      public void DoAbility() {
+        if (isOverridden) return;
+        ProcessAbility();
+      }
+
+      /// <summary>
+      /// Override the ability, immediately stopping usage
+      /// </summary>
+      /// <param name="o">Enable or disable override</param>
+      public void Override(bool enabled) {
+        if (enabled) {
+          OnOverrideEnable();
+        } else {
+          OnOverrideDisable();
+        }
+        isOverridden = enabled;
+      }
+
+      /// <summary>
+      /// Called once per physics update unless ability is overridden
+      /// </summary>
+      protected virtual void ProcessAbility() { }
 
       /// <summary>
       /// Called once when the ability is enabled
       /// </summary>
       protected virtual void Initialize() { }
+
+      /// <summary>
+      /// Called when ability is overridden
+      /// </summary>
+      protected virtual void OnOverrideEnable() { }
+
+      /// <summary>
+      /// Called when ability override is removed
+      /// </summary>
+      protected virtual void OnOverrideDisable() { }
 
       protected void ChangeState(AbilityStates newState) {
         if (state == newState) return;
@@ -64,19 +96,22 @@ namespace DreamState {
         switch (newState) {
           case AbilityStates.Doing:
             if (state == AbilityStates.Stopped) {
-              onStartCallbacks.ForEach(c => c());
+              onStartCallbacks();
             }
-            onDoingCallbacks.ForEach(c => c());
+            onDoingCallbacks();
             break;
           case AbilityStates.Stopped:
-            onStopCallbacks.ForEach(c => c());
+            onStopCallbacks();
             break;
         }
         state = newState;
       }
 
-      private void OnEnable() {
+      private void Awake() {
         physics = GetComponent<PlatformerPhysics>();
+      }
+
+      private void OnEnable() {
         physics.RegisterAbility(this);
         Initialize();
       }

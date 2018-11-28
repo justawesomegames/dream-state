@@ -12,13 +12,12 @@ namespace DreamState {
     public class EdgeCollisionInfo {
       private List<RaycastHit2D> hits;
       private PlatformerPhysics physics;
-      private List<Action<bool>> callbacks;
+      private event Action<bool> onCollisionChange = delegate { };
       private bool lastCollisionState;
 
       public EdgeCollisionInfo(PlatformerPhysics p) {
         physics = p;
         hits = new List<RaycastHit2D>();
-        callbacks = new List<Action<bool>>();
       }
 
       public void AddHit(RaycastHit2D hit) {
@@ -55,14 +54,14 @@ namespace DreamState {
         var colliding = IsColliding();
 
         if (colliding != lastCollisionState) {
-          callbacks.ForEach(c => c(colliding));
+          onCollisionChange(colliding);
         }
 
         lastCollisionState = colliding;
       }
 
       public void RegisterCallback(Action<bool> callback) {
-        callbacks.Add(callback);
+        onCollisionChange += callback;
       }
     }
   }

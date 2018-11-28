@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using DreamState.Abilities;
 
 namespace DreamState {
   public class AbilityManager : MonoBehaviour {
@@ -11,16 +12,20 @@ namespace DreamState {
 
     private CharacterStats characterStats;
     private float[] cooldowns;
-    private int curAbilityIndex;
-    private float curChargeTime;
+    private float[] chargeTimes;
 
-    public void OnAbilityDown() {
-      if (cooldowns[curAbilityIndex] > 0) {
+    public void Cast<T>() {
+      var abilityIndex = IndexFor<T>();
+      if (abilityIndex == -1) {
+        return;
+      }
+
+      if (cooldowns[abilityIndex] > 0) {
         // TODO: Notify something about on cooldown
         return;
       }
 
-      var ability = abilities[curAbilityIndex];
+      var ability = abilities[abilityIndex];
       if (characterStats != null) {
         if (!characterStats.CanExpendResource(ability.ResourceCost)) {
           // TODO: Notify something about insufficient resource
@@ -30,51 +35,40 @@ namespace DreamState {
       }
 
       ability.DoAbility(gameObject, rangeAbilitySpawnPoint, damagesWhichTags);
-      cooldowns[curAbilityIndex] = ability.Cooldown;
+      cooldowns[abilityIndex] = ability.Cooldown;
     }
 
-    public void OnAbilityHold() {
-      curChargeTime += Time.deltaTime;
+    public void Charge<T>() {
+      var abilityIndex = IndexFor<T>();
+      if (abilityIndex == -1) {
+        return;
+      }
+
+      chargeTimes[abilityIndex] += Time.deltaTime;
     }
 
-    public void OnAbilityUp() {
-      for (int i = abilities[curAbilityIndex].ChargeTimes.Length - 1; i >= 0; i--) {
-        if (curChargeTime >= abilities[curAbilityIndex].ChargeTimes[i]) {
-          abilities[curAbilityIndex].ChargeAbilities[i].DoAbility(gameObject, rangeAbilitySpawnPoint, damagesWhichTags);
+    public void ReleaseCharge<T>() {
+      var abilityIndex = IndexFor<T>();
+      if (abilityIndex == -1) {
+        for (int i = 0; i < chargeTimes.Length; i++) {
+          chargeTimes[i] = 0;
+        }
+        return;
+      }
+
+      for (int i = abilities[abilityIndex].ChargeTimes.Length - 1; i >= 0; i--) {
+        if (chargeTimes[abilityIndex] >= abilities[abilityIndex].ChargeTimes[i]) {
+          abilities[abilityIndex].ChargeAbilities[i].DoAbility(gameObject, rangeAbilitySpawnPoint, damagesWhichTags);
           break;
         }
       }
 
-      curChargeTime = 0;
+      chargeTimes[abilityIndex] = 0;
     }
 
-    public void NextAbility() {
-      curAbilityIndex++;
-      if (curAbilityIndex >= abilities.Count) curAbilityIndex = 0;
-    }
-
-    public void PreviousAbility() {
-      curAbilityIndex--;
-      if (curAbilityIndex < 0) curAbilityIndex = abilities.Count - 1;
-    }
-
-    public void AddAbility(BaseAbility ability) {
-      if (abilities.Any(a => a.Name == ability.Name)) {
-        Debug.LogError(String.Format("Ability {0} already exists on {1}", ability.Name, gameObject.name));
-        return;
-      }
-
-      abilities.Add(ability);
-
-      var newCooldowns = new float[abilities.Count];
-      for (int i = 0; i < cooldowns.Length; i++) {
-        newCooldowns[i] = cooldowns[i];
-      }
-      cooldowns = newCooldowns;
-    }
-
-    private void OnEnable() {
+    private void Awake() {
       cooldowns = new float[abilities.Count];
+      chargeTimes = new float[abilities.Count];
       characterStats = GetComponent<CharacterStats>();
     }
 
@@ -84,6 +78,17 @@ namespace DreamState {
           cooldowns[i] -= Time.deltaTime;
         }
       }
+    }
+
+    private int IndexFor<T>() {
+      for (int i = 0; i < abilities.Count; i++) {
+        if (abilities[i] is T) {
+          return i;
+        }
+      }
+
+      Debug.LogWarning(string.Format("Ability of type {0} is not found.", typeof(T).ToString()));
+      return -1;
     }
   }
 }

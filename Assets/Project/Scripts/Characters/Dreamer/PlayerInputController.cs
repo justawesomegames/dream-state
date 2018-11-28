@@ -1,5 +1,6 @@
 using UnityEngine;
 using DreamState.Physics;
+using DreamState.Abilities;
 
 namespace DreamState {
   public class PlayerInputController : MonoBehaviour {
@@ -97,9 +98,9 @@ namespace DreamState {
 
       // Attacking
       if (abilityManager != null) {
-        InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Down, abilityManager.OnAbilityDown);
-        InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Hold, abilityManager.OnAbilityHold);
-        InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Up, abilityManager.OnAbilityUp);
+        InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Down, abilityManager.Cast<Blast>);
+        InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Hold, abilityManager.Charge<Blast>);
+        InputManager.Instance.RegisterEvent(InputContexts.Playing, InputButtons.Attack, InputButtonActions.Up, abilityManager.ReleaseCharge<Blast>);
       }
 
       // Pausing

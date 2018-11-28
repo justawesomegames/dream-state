@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using DreamState.Abilities;
 
 namespace DreamState {
   [RequireComponent(typeof(Rigidbody2D))]

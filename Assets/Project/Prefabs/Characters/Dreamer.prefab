@@ -186,7 +186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   abilities:
-  - {fileID: 11400000, guid: ec3d954171d5d8c4986cc7586c2b928b, type: 2}
+  - {fileID: 114904491069170510, guid: 0a4cf5eb4ed2fb74e8e1b148b1e2d35f, type: 2}
   rangeAbilitySpawnPoint: {fileID: 4865601542845024}
   damagesWhichTags:
   - Enemy

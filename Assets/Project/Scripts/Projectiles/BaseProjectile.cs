@@ -14,8 +14,8 @@ namespace DreamState {
     private bool facingRight = true;
     private List<string> damagesWhat;
 
-    public void Initialize(GameObject caster, BaseAbility ability, List<string> damagesWhat) {
-      damage = ability.Damage;
+    public void Initialize(GameObject caster, Ability ability, List<string> damagesWhat) {
+      damage = ability.CalculateDamage();
       this.caster = caster;
       this.damagesWhat = damagesWhat;
 

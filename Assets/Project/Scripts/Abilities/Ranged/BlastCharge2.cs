@@ -3,6 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace DreamState.Abilities {
-  public class BlastCharge2 : RangedAbility {
+  public class BlastCharge2 : SingleHorizontalShoot {
   }
 }
